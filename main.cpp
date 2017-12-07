@@ -3,15 +3,29 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
+#define GREEDY 0
+#define EXPLATORY 1
 
 using namespace std;
 
-struct state {
-	int mat[3][3];
+class state {
+	int gridSize;
+	std::vector<std::vector<int> > mat;
 	float val;
+	state(int value){
+		gridSize = value;
+		for (int i = 0; i < gridSize; i++) {
+			for (int j = 0; j < gridSize; j++){
+				mat[i][j] = 0;
+			}
+		}
+		val = 0.5;
+	}
+	~state(void){}
 };
 
 std::vector<state> stateArray;
+const int alpha;
 
 bool compareMatrices(int mat1[3][3], int mat2[3][3]){
 	for (int i = 0; i < 3; i++) {
@@ -24,7 +38,7 @@ bool compareMatrices(int mat1[3][3], int mat2[3][3]){
 
 // checks the state array if the given state already exist or not
 
-float checkStateArray(state s){
+float getVal(state s){
 	for (int i = 0; i < stateArray.size(); i++){
 		if (compareMatrices(s.mat, stateArray[i].mat)) {
 			return stateArray[i].val;
@@ -48,7 +62,7 @@ void nextState (state const &currState, state &nextState, int policy){
                         	if (currState.mat[i][j] == 0){
                                 	equate(currState, nextState);
                                 	nextState.mat[i][j] = 1;
-                                	nextState.val = checkStateArray(nextState);
+                                	nextState.val = getVal(nextState);
                                 	if (nextValue.val >= largestValue){
                                         	largestValue = nextValue.val;
                                         	equate(nextState, dummyState);
@@ -64,7 +78,7 @@ void nextState (state const &currState, state &nextState, int policy){
 		if ( position == 9) position = 8;
 		equate (currState, nextState);
 		nextState.mat[position/3][position%3] = 1;
-		nextState.val = checkStateArray(nextState);		
+		nextState.val = getVal(nextState);		
 	}
 }
 
@@ -83,4 +97,56 @@ int last_to_act(state prevState){
 	else if (count_x == (count_0 + 1)) return 1;
 
 	return 0;
-}	
+}
+
+int getStateIndex(state &State){
+
+	for (int i = 0; i < stateArray.size(); i++) {
+		if (compareMatrices(State.mat, stateArray[i].mat)) return i;
+	}
+	
+	return i;
+
+}
+
+void backUp(state &prevState, state &currState){
+
+	// assuming prevState and currState has already been pushed in the stateArray
+
+	prevState.val = prevState.val + alpha*(currState.val - prevState.val);
+
+}
+
+void pushBack(state &currState){
+
+	stateArray.push_back(currState);
+
+}
+
+void playGame(float epsilon){ // plays a game, objective is to update the stateArray and value function table
+	
+	state prevState(3);
+	
+	while(GameOver(prevState.mat)){
+		
+		state currState = new state(3);
+		nextState(prevState, currState, policy);
+		stateArray.push_back(currState);
+		if (GameOver(currState.mat)) break;
+		
+	}		
+}
+
+bool game(){} // only plays not update, output will be win or loose 
+
+int main(int argc, char **argv){
+
+	int gamesCount = 0;
+	std::cin >> gamesCount;
+	std::cin >> policy;
+
+	for (int i =0; i < gamesCount; i++) {
+		playGame();
+	}
+
+}
