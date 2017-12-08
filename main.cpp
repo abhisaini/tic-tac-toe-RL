@@ -163,16 +163,20 @@ void pushBack(state &currState){
 
 }
 
-void playGame(float epsilon){ // plays a game, objective is to update the stateArray and value function table
+void playGame(int gameCondition){ // plays a game, objective is to update the stateArray and value function table
 
 	state prevState(3);
 
 	while(GameOver(prevState.mat)){
-
+		int gameCondition;
 		state currState = new state(3);
 		nextState(prevState, currState, policy);
 		stateArray.push_back(currState);
-		if (GameOver(currState.mat)) break;
+		gameCondition=GameOver();
+		if(gameCondition!=2) break; //function GameOver() will return if game is not over
+		randomMove();
+		if(gameCondition!=2) break;
+
 
 	}
 }
@@ -182,11 +186,20 @@ bool game(){} // only plays not update, output will be win or loose
 int main(int argc, char **argv){
 
 	int gamesCount = 0;
+	int gamesWin=0,gamesDraw=0,gamesLose=0;
+	int probWin,probLose,probDraw;
 	std::cin >> gamesCount;
 	std::cin >> policy;
 
 	for (int i =0; i < gamesCount; i++) {
-		playGame();
+		int gameCondition;
+		playGame(gameCondition);
+		if(gameCondition==1) gamesWin++; //function GameOver will return 1 if won
+		if(gameCondition==0) gamesLose++;//function GameOver will return 0 if loose
+		if(gameCondition==4) gamesDraw++;//function GameOver will return 4 if draw
+		if(gamesCount>=100){
+
+		}
 	}
 
 }
