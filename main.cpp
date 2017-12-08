@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <cstdlib>
 #define GREEDY 0
 #define EXPLATORY 1
@@ -190,16 +191,34 @@ int main(int argc, char **argv){
 	int probWin,probLose,probDraw;
 	std::cin >> gamesCount;
 	std::cin >> policy;
+	string results = "result.txt";
+	ofstream fout(results.c_str());
+	if (!fout) {
+      	cerr << "error: open file for results failed!" << endl;
+      	abort();  // in <cstdlib> header
+   }
+
 
 	for (int i =0; i < gamesCount; i++) {
 		int gameCondition;
 		playGame(gameCondition);
-		if(gameCondition==1) gamesWin++; //function GameOver will return 1 if won
-		if(gameCondition==0) gamesLose++;//function GameOver will return 0 if loose
-		if(gameCondition==4) gamesDraw++;//function GameOver will return 4 if draw
+		if(gameCondition==1){      //function GameOver will return 1 if won
+			gamesWin++;
+			fout << "Game No:"<<gamesCount<<" Result:Won"<<endl;
+		}
+		if(gameCondition==0){ //function GameOver will return 0 if loose
+			gamesLose++;
+			fout << "Game No:"<<gamesCount<<" Result:Lost"<<endl;
+		}
+		if(gameCondition==4) {//function GameOver will return 4 if draw
+			gamesDraw++;
+			fout << "Game No:"<<gamesCount<<" Result:Draw"<<endl;
+		}
 		if(gamesCount>=100){
 
 		}
 	}
+	fout.close();
+
 
 }
