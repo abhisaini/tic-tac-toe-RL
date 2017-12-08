@@ -36,6 +36,46 @@ bool compareMatrices(int mat1[3][3], int mat2[3][3]){
 	return true;
 }
 
+
+//function to check value of states which are not stored and pushback them
+int getValUnknown(std::vector<std::vector<int> > checkval)
+{
+	int val=0.5;
+    //checking for 3 1s or 3 -1s in a row
+    for(int i=0;i<3;i++){
+        if((checkval[i][1]==1)&&(checkval[i][2]==1)&&(checkval[i][3]==1)){
+            val = 1;
+        }
+
+        if((checkval[i][1]==-1)&&(checkval[i][2]==-1)&&(checkval[i][3]==-1)){
+            val = 0;
+        }
+    }
+
+    //checking for 3 1s or 3 -1s in a column
+    for(int i=0;i<3;i++){
+        if((checkval[1][i]==1)&&(checkval[2][i]==1)&&(checkval[3][i]==1)){
+            val = 1;
+        }
+
+        if((checkval[3][i]==-1)&&(checkval[2][i]==-1)&&(checkval[3][i]==-1)){
+            val = 0;
+        }
+    }
+    //checking for 3 1s in both the diagonals and return 1 for win
+    if(((checkval[1][1]==1)&&(checkval[2][2]==1)&&(checkval[3][3]==1))||((checkval[3][1]==1)&&(checkval[2][2]==1)&&(checkval[1][3]==1))){
+        val = 1;
+    }
+    //checking for 3 1s in both the  and return 0 for lose
+    if(((checkval[1][1]==-1)&&(checkval[2][2]==-1)&&(checkval[3][3]==-1))||((checkval[3][1]==-1)&&(checkval[2][2]==-1)&&(checkval[1][3]==-1))){
+        val = 0;
+    }
+
+    return val;
+}
+
+
+
 // checks the state array if the given state already exist or not
 
 float getVal(state s){
@@ -44,7 +84,7 @@ float getVal(state s){
 			return stateArray[i].val;
 		}
 	}
-	return 0.5;
+	return getValUnknown(s.mat);
 }
 
 void equate (state &state1, state &state2) {
@@ -53,10 +93,10 @@ void equate (state &state1, state &state2) {
 }
 
 void nextState (state const &currState, state &nextState, int policy){
-	
+
 	float largestValue = 0;
 	state dummyState;
-	if (policy == 1){	
+	if (policy == 1){
 		for (int i = 0; i < 3; i++) {
                 	for (int j = 0; j < 3; j++) {
                         	if (currState.mat[i][j] == 0){
@@ -78,7 +118,7 @@ void nextState (state const &currState, state &nextState, int policy){
 		if ( position == 9) position = 8;
 		equate (currState, nextState);
 		nextState.mat[position/3][position%3] = 1;
-		nextState.val = getVal(nextState);		
+		nextState.val = getVal(nextState);
 	}
 }
 
@@ -104,7 +144,7 @@ int getStateIndex(state &State){
 	for (int i = 0; i < stateArray.size(); i++) {
 		if (compareMatrices(State.mat, stateArray[i].mat)) return i;
 	}
-	
+
 	return i;
 
 }
@@ -124,20 +164,20 @@ void pushBack(state &currState){
 }
 
 void playGame(float epsilon){ // plays a game, objective is to update the stateArray and value function table
-	
+
 	state prevState(3);
-	
+
 	while(GameOver(prevState.mat)){
-		
+
 		state currState = new state(3);
 		nextState(prevState, currState, policy);
 		stateArray.push_back(currState);
 		if (GameOver(currState.mat)) break;
-		
-	}		
+
+	}
 }
 
-bool game(){} // only plays not update, output will be win or loose 
+bool game(){} // only plays not update, output will be win or loose
 
 int main(int argc, char **argv){
 
