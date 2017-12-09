@@ -9,9 +9,15 @@
 
 using namespace std;
 
+typedef std::vector<std::vector<int> > Matrix;
+
+std::vector<state> stateArray;
+const int alpha;
+
 class state {
+public:
 	int gridSize;
-	std::vector<std::vector<int> > mat;
+	Matrix mat;
 	float val;
 	state(int value){
 		gridSize = value;
@@ -25,12 +31,9 @@ class state {
 	~state(void){}
 };
 
-std::vector<state> stateArray;
-const int alpha;
-
-bool compareMatrices(int mat1[3][3], int mat2[3][3]){
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3;){
+bool compareMatrices(Matrix mat1, Matrix mat2){
+	for (int i = 0; i < mat1.size(); i++) {
+		for (int j = 0; j < mat1.size(); j++){
 			if (mat1[i][j] != mat2[i][j]) return false;
 		}
 	}
@@ -38,8 +41,8 @@ bool compareMatrices(int mat1[3][3], int mat2[3][3]){
 }
 
 
-//function to check value of states which are not stored and pushback them
-int getValUnknown(std::vector<std::vector<int> > checkval)
+//function to check value of states which are not stored
+int getValUnknown(Matrix checkval)
 {
 	int val=0.5;
     //checking for 3 1s or 3 -1s in a row
@@ -75,12 +78,9 @@ int getValUnknown(std::vector<std::vector<int> > checkval)
     return val;
 }
 
-
-
 // checks the state array if the given state already exist or not
-
 float getVal(state s){
-	for (int i = 0; i < stateArray.size(); i++){
+	for (int i = 0; i < stateArray.size(); i++) {
 		if (compareMatrices(s.mat, stateArray[i].mat)) {
 			return stateArray[i].val;
 		}
@@ -88,12 +88,64 @@ float getVal(state s){
 	return getValUnknown(s.mat);
 }
 
-void equate (state &state1, state &state2) {
-	state2.mat = state1.mat;
+void equate(state const &state1, state &state2) {
+	for (int i = 0; i < state1.size(); i++) {
+		for (int j = 0; j < state1.size(); j++) {
+			state2.mat[i][j] = state1.mat[i][j];
+		}
+	}
 	state2.val = state1.val;
 }
 
-void nextState (state const &currState, state &nextState, int policy){
+int spaceRandom(Matrix state[3][3]) {
+    int val=1;
+    for(int i=0;i<3;i++) {
+       for(int j=0;j<3;j++) {
+           if(state[i][j]!=0) {
+               val++;
+           }
+       }
+   }
+    return 10-val;
+}
+
+//to get the random move from possible moves
+int randomInput(int arr[], int size){
+    int input=rand()%size;
+    return arr[input];
+}
+
+//to make the move i.e. to change the value from 0 to -1 for possible move
+void randomChanged(state const &S1, state &S2, int move, int player){
+
+	int size = state.mat.size();
+	int moveX=move/size, moveY=move%size;
+	equate(S1, S2);
+  S2.mat[moveX][moveY]= player;
+  return;
+}
+
+//the main function to call to decide random player's move.It will play the move by itself
+void randomMove(state const &S, state &S1, int player){
+    int space=spaceRandom(S.mat);
+    int i=0,j=0,index=0;
+    int freespace[space];
+    for(i=0;i<3;i++){
+        for(j=0;j<3;j++){
+            if(S.mat[i][j]==0){
+                freespace[index]=3*i+j;
+                index++;
+            }
+        }
+    }
+    int move=randomInput(freespace,space);
+
+    randomChanged(S, S1, move, player);
+    return ;
+}
+
+
+void nextState (state const &currState, state &nextState, int policy, int player){
 
 	float largestValue = 0;
 	state dummyState;
@@ -115,13 +167,11 @@ void nextState (state const &currState, state &nextState, int policy){
 	}
 
 	else {
-		int position = rand()%10;
-		if ( position == 9) position = 8;
-		equate (currState, nextState);
-		nextState.mat[position/3][position%3] = 1;
-		nextState.val = getVal(nextState);
+		randomMove(currState, nextState, player);
 	}
 }
+
+
 
 int last_to_act(state prevState){
 	int count_x = 0;
@@ -146,43 +196,68 @@ int getStateIndex(state &State){
 		if (compareMatrices(State.mat, stateArray[i].mat)) return i;
 	}
 
-	return i;
+	return -1;
 
 }
 
-void backUp(state &prevState, state &currState){
-
+void backUp(state &prevState, state &currState)
 	// assuming prevState and currState has already been pushed in the stateArray
-
 	prevState.val = prevState.val + alpha*(currState.val - prevState.val);
-
 }
 
-void pushBack(state &currState){
-
-	stateArray.push_back(currState);
-
+void pushBack(state const &S){
+	state S = new state(3);
+	equate(S1, S);
+	stateArray.push_back(S);
 }
 
-void playGame(int gameCondition){ // plays a game, objective is to update the stateArray and value function table
+bool alreadyExist(state S){
+	for (int i = 0; i < stateArray.size(); i++){
+		if (compareMatrices(stateArray[i], S)) return false;
+	}
+	return true;
+}
 
-	state prevState(3);
+void playGame(float epsilon){ // plays a game, objective is to update the stateArray and value function table
 
-	while(GameOver(prevState.mat)){
-		int gameCondition;
-		state currState = new state(3);
-		nextState(prevState, currState, policy);
-		stateArray.push_back(currState);
-		gameCondition=GameOver();
-		if(gameCondition!=2) break; //function GameOver() will return if game is not over
-		randomMove();
-		if(gameCondition!=2) break;
+	state oState = new state(3);
+	state xstate = new state(3);
+	state dummyState = new state(3);
 
+	int turns = int (1/epsilon);
+	int j = 0;
+
+	while(1){
+
+		j++;
+		if (!j%turns) policy = 1;
+		nextState(oState, xState, policy, 1);
+		if (!alreadyExist(xState)) pushBack(xState);
+		int i = getStateIndex(dummyState);
+		if (i != -1) backUp(stateArray[i], xState);
+		if (GameOver(xState)) break;
+		equate(dummyState, xState);
+		nextState(xState, oState, 0, 0);
+		if (GameOver(oState)) break;
 
 	}
 }
 
-bool game(){} // only plays not update, output will be win or loose
+bool game(){ // only plays not update, output will be win or loose
+
+	state oState = new state(3);
+	state xstate = new state(3);
+
+	while(1){
+
+		nextState(oState, xState, 1, 1);
+		if (GameOver(xState)) return true;
+		nextState(xState, oState, 0, 0);
+		if (GameOver(oState)) return false;
+
+	}
+
+}
 
 int main(int argc, char **argv){
 
@@ -219,6 +294,5 @@ int main(int argc, char **argv){
 		}
 	}
 	fout.close();
-
 
 }
