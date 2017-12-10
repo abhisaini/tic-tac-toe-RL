@@ -47,41 +47,50 @@ std::vector<state> stateArray;
 //function to check value of states which are not stored
 float getValUnknown(Matrix checkval)
 {
-    float val=0.5;
-    //checking for 3 1s or 3 -1s in a row
-    for(int i=0;i<3;i++){
+	int sz=arr.size();
+	float val=0.5;
 
-        if((checkval[i][0]==1)&&(checkval[i][1]==1)&&(checkval[i][2]==1)){
-            val = 1;
-        }
+	//checking for sz 1s or sz -1s in every row
+	for(int i = 0; i < sz; i++){
+		int sum = 0;
+		for(int j = 0; j < sz; j++){
+					sum = sum + arr[i][j];
+		}
+		if (sum == sz){
+			return 1;
+		}
+		if(sum == -sz){
+			return 0;
+		}
+	}
 
-        if((checkval[i][0]==-1)&&(checkval[i][1]==-1)&&(checkval[i][2]==-1)){
-            val = 0;
-        }
-    }
+	//checking for sz 1s or sz -1s in a column
+	for(int i = 0; i < sz; i++){
+		int sum = 0;
+		for(int j = 0; j < sz; j++){
+			sum = sum + arr[j][i];
+		}
+		if(sum == sz){
+			return 1;
+		}
+		if(sum == -sz){
+			return 0;
+		}
+	}
 
-    //checking for 3 1s or 3 -1s in a column
-    for(int i=0;i<3;i++){
 
-        if((checkval[0][i]==1)&&(checkval[1][i]==1)&&(checkval[2][i]==1)){
-            val = 1;
-        }
+	//checking sz 1s or -1s in  diagonal
+	int sumd1 = 0, sumd2 = 0;
+	for(int i = 0; i < sz; i++){
+		sumd1 = sumd1 + arr[i][i];
+		sumd2 = sumd2 + arr[i][sz-1-i];
+	}
+	if(sumd1 == sz||sumd2 == sz) return 1;
+	if(sumd1 == sz||sumd2 == sz) return 0;
 
-        if((checkval[0][i]==-1)&&(checkval[1][i]==-1)&&(checkval[2][i]==-1)){
-            val = 0;
-        }
-    }
-    //checking for 3 1s in both the diagonals and return 1 for win
-    if(((checkval[0][0]==1)&&(checkval[1][1]==1)&&(checkval[2][2]==1))||((checkval[2][0]==1)&&(checkval[1][1]==1)&&(checkval[0][2]==1))){
-        val = 1;
-    }
-    //checking for 3 1s in both the  and return 0 for lose
-    if(((checkval[0][0]==-1)&&(checkval[1][1]==-1)&&(checkval[2][2]==-1))||((checkval[2][0]==-1)&&(checkval[1][1]==-1)&&(checkval[0][2]==-1))){
-        val = 0;
-    }
-
-    return val;
+	return val;
 }
+
 // checks the state array if the given state already exist or not
 float getVal(state s){
 	for (int i = 0; i < stateArray.size(); i++) {
@@ -101,7 +110,6 @@ void equate(state &state1, state &state2) {
 	state2.val = state1.val;
 }
 
-<<<<<<< HEAD
 int spaceRandom(Matrix state) {
 	int sz=s.mat.size();
 	int val=0;
@@ -113,55 +121,27 @@ int spaceRandom(Matrix state) {
 		 }
  	}
 	return sz*sz-val;
-=======
-
-//the below snippet represents function randomMove(),whose input are a const state state1,a state state 2,player(1 or -1).And the function will change state2 such that state2 is next random move for state1 and player given
-/******************************************************************************************************************************
-********************************************************************************************************************************/
-//will return possible space at any state and takes state as input
-int spaceRandom(state const &s) {
-    int sz=s.mat.size();
-    int val=0;
-    for(int i=0;i<sz;i++) {
-       for(int j=0;j<sz;j++) {
-           if(s.mat[i][j]!=0) {
-               val++;
-           }
-       }
-   }
-    return sz*sz-val;
->>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 }
 
-//function will take the array containing the position of vacancies as input and returns a random vacancy
-int randomInput(int arr[], int length){
-    int input=rand()%length;
+//to get the random move from possible moves
+int randomInput(int arr[], int size){
+    int input=rand()%size;
     return arr[input];
 }
 
-<<<<<<< HEAD
 //to make the move i.e. to change the value from 0 to -1 for possible move
 void randomChanged(state &S1, state &S2, int move, int player){
-=======
-//it will make the move i.e it takes the state,vacancy and player(1 or -1) as input and changes the vacancy to player
-void randomChanged(state const &S1, state &S2, int move, int player){
->>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 
-	int sz = S1.mat.size();
-	int moveX=move/sz, moveY=move%sz;
-    equate(S1, S2);
-
-    S2.mat[moveX][moveY]= player;
+	int size = state.mat.size();
+	int moveX=move/size, moveY=move%size;
+	equate(S1, S2);
+  S2.mat[moveX][moveY]= player;
   return;
 }
 
-
+//the main function to call to decide random player's move.It will play the move by itself
 void randomMove(state const &S, state &S1, int player){
-<<<<<<< HEAD
 		int space=spaceRandom(S);
-=======
-    int space=spaceRandom(S);
->>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
     int sz=S.mat.size();
     int i=0,j=0,index=0;
     int freespace[space];
@@ -179,7 +159,6 @@ void randomMove(state const &S, state &S1, int player){
 		return ;
 }
 
-<<<<<<< HEAD
 // function to check status of game at certain state
 int GameOver(int state[3][3])
 {
@@ -188,11 +167,6 @@ int GameOver(int state[3][3])
         if((state[i][1]==PLAYER_X)&&(state[i][2]==PLAYER_X)&&(state[i][3]==PLAYER_X)){
             return WIN;
         }
-=======
-/******************************************************************************************************************************
-********************************************************************************************************************************/
-
->>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 
         if((state[i][1]==PLAYER_O)&&(state[i][2]==PLAYER_O)&&(state[i][3]==PLAYER_O)){
             return LOSE;
