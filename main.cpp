@@ -97,43 +97,51 @@ void equate(state const &state1, state &state2) {
 	state2.val = state1.val;
 }
 
-int spaceRandom(Matrix state[3][3]) {
-    int val=1;
-    for(int i=0;i<3;i++) {
-       for(int j=0;j<3;j++) {
-           if(state[i][j]!=0) {
+
+//the below snippet represents function randomMove(),whose input are a const state state1,a state state 2,player(1 or -1).And the function will change state2 such that state2 is next random move for state1 and player given
+/******************************************************************************************************************************
+********************************************************************************************************************************/
+//will return possible space at any state and takes state as input
+int spaceRandom(state const &s) {
+    int sz=s.mat.size();
+    int val=0;
+    for(int i=0;i<sz;i++) {
+       for(int j=0;j<sz;j++) {
+           if(s.mat[i][j]!=0) {
                val++;
            }
        }
    }
-    return 10-val;
+    return sz*sz-val;
 }
 
-//to get the random move from possible moves
-int randomInput(int arr[], int size){
-    int input=rand()%size;
+//function will take the array containing the position of vacancies as input and returns a random vacancy
+int randomInput(int arr[], int length){
+    int input=rand()%length;
     return arr[input];
 }
 
-//to make the move i.e. to change the value from 0 to -1 for possible move
+//it will make the move i.e it takes the state,vacancy and player(1 or -1) as input and changes the vacancy to player
 void randomChanged(state const &S1, state &S2, int move, int player){
 
-	int size = state.mat.size();
-	int moveX=move/size, moveY=move%size;
-	equate(S1, S2);
-  S2.mat[moveX][moveY]= player;
+	int sz = S1.mat.size();
+	int moveX=move/sz, moveY=move%sz;
+    equate(S1, S2);
+
+    S2.mat[moveX][moveY]= player;
   return;
 }
 
-//the main function to call to decide random player's move.It will play the move by itself
+
 void randomMove(state const &S, state &S1, int player){
-    int space=spaceRandom(S.mat);
+    int space=spaceRandom(S);
+    int sz=S.mat.size();
     int i=0,j=0,index=0;
     int freespace[space];
-    for(i=0;i<3;i++){
-        for(j=0;j<3;j++){
+    for(i=0;i<sz;i++){
+        for(j=0;j<sz;j++){
             if(S.mat[i][j]==0){
-                freespace[index]=3*i+j;
+                freespace[index]=sz*i+j;
                 index++;
             }
         }
@@ -143,6 +151,9 @@ void randomMove(state const &S, state &S1, int player){
     randomChanged(S, S1, move, player);
     return ;
 }
+
+/******************************************************************************************************************************
+********************************************************************************************************************************/
 
 
 void nextState (state const &currState, state &nextState, int policy, int player){
