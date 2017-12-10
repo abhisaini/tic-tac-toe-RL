@@ -101,6 +101,7 @@ void equate(state &state1, state &state2) {
 	state2.val = state1.val;
 }
 
+<<<<<<< HEAD
 int spaceRandom(Matrix state) {
 	int sz=s.mat.size();
 	int val=0;
@@ -112,27 +113,55 @@ int spaceRandom(Matrix state) {
 		 }
  	}
 	return sz*sz-val;
+=======
+
+//the below snippet represents function randomMove(),whose input are a const state state1,a state state 2,player(1 or -1).And the function will change state2 such that state2 is next random move for state1 and player given
+/******************************************************************************************************************************
+********************************************************************************************************************************/
+//will return possible space at any state and takes state as input
+int spaceRandom(state const &s) {
+    int sz=s.mat.size();
+    int val=0;
+    for(int i=0;i<sz;i++) {
+       for(int j=0;j<sz;j++) {
+           if(s.mat[i][j]!=0) {
+               val++;
+           }
+       }
+   }
+    return sz*sz-val;
+>>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 }
 
-//to get the random move from possible moves
-int randomInput(int arr[], int size){
-    int input=rand()%size;
+//function will take the array containing the position of vacancies as input and returns a random vacancy
+int randomInput(int arr[], int length){
+    int input=rand()%length;
     return arr[input];
 }
 
+<<<<<<< HEAD
 //to make the move i.e. to change the value from 0 to -1 for possible move
 void randomChanged(state &S1, state &S2, int move, int player){
+=======
+//it will make the move i.e it takes the state,vacancy and player(1 or -1) as input and changes the vacancy to player
+void randomChanged(state const &S1, state &S2, int move, int player){
+>>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 
-	int size = state.mat.size();
-	int moveX=move/size, moveY=move%size;
-	equate(S1, S2);
-  S2.mat[moveX][moveY]= player;
+	int sz = S1.mat.size();
+	int moveX=move/sz, moveY=move%sz;
+    equate(S1, S2);
+
+    S2.mat[moveX][moveY]= player;
   return;
 }
 
-//the main function to call to decide random player's move.It will play the move by itself
+
 void randomMove(state const &S, state &S1, int player){
+<<<<<<< HEAD
 		int space=spaceRandom(S);
+=======
+    int space=spaceRandom(S);
+>>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
     int sz=S.mat.size();
     int i=0,j=0,index=0;
     int freespace[space];
@@ -150,6 +179,7 @@ void randomMove(state const &S, state &S1, int player){
 		return ;
 }
 
+<<<<<<< HEAD
 // function to check status of game at certain state
 int GameOver(int state[3][3])
 {
@@ -158,6 +188,11 @@ int GameOver(int state[3][3])
         if((state[i][1]==PLAYER_X)&&(state[i][2]==PLAYER_X)&&(state[i][3]==PLAYER_X)){
             return WIN;
         }
+=======
+/******************************************************************************************************************************
+********************************************************************************************************************************/
+
+>>>>>>> 0a4c8bca93f9af7f799573cd665576e969f1b84a
 
         if((state[i][1]==PLAYER_O)&&(state[i][2]==PLAYER_O)&&(state[i][3]==PLAYER_O)){
             return LOSE;
