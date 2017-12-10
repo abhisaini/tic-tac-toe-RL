@@ -1,0 +1,13 @@
+//Must be placed below functions spaceRandom and getValUnknown
+//input will be the state 
+//will return 1 for win,0 for loose,2 for game not over,4 for draw
+/*******************************************************/
+int gameOver(state &arr){
+    float val=getValUnknown(arr.mat);
+    int vacancy=spaceRandom(arr);
+    if(vacancy==0&&val==0.5) return 4; //4 stands for draw
+    if(val!=0.5) return val;//will return 0 if lost and 1 if won;
+    else if(vacancy>0&&val==0.5) return 2;//2 stands for game not over yet
+    
+}
+/********************************************************/
