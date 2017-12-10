@@ -5,14 +5,17 @@
 #include <fstream>
 #include <cstdlib>
 #define GREEDY 0
-#define EXPLATORY 1
+#define EXPLORATORY 1
+#define PLAYER_X 1
+#define PLAYER_O -1
+#define EMPTY 0
+#define WIN 1
+#define LOSE -1
+#define DRAW 0
 
 using namespace std;
 
 typedef std::vector<std::vector<int> > Matrix;
-
-std::vector<state> stateArray;
-const int alpha;
 
 class state {
 public:
@@ -21,10 +24,9 @@ public:
 	float val;
 	state(int value){
 		gridSize = value;
-		for (int i = 0; i < gridSize; i++) {
-			for (int j = 0; j < gridSize; j++){
-				mat[i][j] = 0;
-			}
+		mat.resize(gridSize);
+		for (int i = 0; i < gridSize; i++)
+		    mat[i].resize(gridSize);
 		}
 		val = 0.5;
 	}
@@ -40,44 +42,46 @@ bool compareMatrices(Matrix mat1, Matrix mat2){
 	return true;
 }
 
+std::vector<state> stateArray;
 
 //function to check value of states which are not stored
-int getValUnknown(Matrix checkval)
+float getValUnknown(Matrix checkval)
 {
-	int val=0.5;
+    float val=0.5;
     //checking for 3 1s or 3 -1s in a row
     for(int i=0;i<3;i++){
-        if((checkval[i][1]==1)&&(checkval[i][2]==1)&&(checkval[i][3]==1)){
+
+        if((checkval[i][0]==1)&&(checkval[i][1]==1)&&(checkval[i][2]==1)){
             val = 1;
         }
 
-        if((checkval[i][1]==-1)&&(checkval[i][2]==-1)&&(checkval[i][3]==-1)){
+        if((checkval[i][0]==-1)&&(checkval[i][1]==-1)&&(checkval[i][2]==-1)){
             val = 0;
         }
     }
 
     //checking for 3 1s or 3 -1s in a column
     for(int i=0;i<3;i++){
-        if((checkval[1][i]==1)&&(checkval[2][i]==1)&&(checkval[3][i]==1)){
+
+        if((checkval[0][i]==1)&&(checkval[1][i]==1)&&(checkval[2][i]==1)){
             val = 1;
         }
 
-        if((checkval[3][i]==-1)&&(checkval[2][i]==-1)&&(checkval[3][i]==-1)){
+        if((checkval[0][i]==-1)&&(checkval[1][i]==-1)&&(checkval[2][i]==-1)){
             val = 0;
         }
     }
     //checking for 3 1s in both the diagonals and return 1 for win
-    if(((checkval[1][1]==1)&&(checkval[2][2]==1)&&(checkval[3][3]==1))||((checkval[3][1]==1)&&(checkval[2][2]==1)&&(checkval[1][3]==1))){
+    if(((checkval[0][0]==1)&&(checkval[1][1]==1)&&(checkval[2][2]==1))||((checkval[2][0]==1)&&(checkval[1][1]==1)&&(checkval[0][2]==1))){
         val = 1;
     }
     //checking for 3 1s in both the  and return 0 for lose
-    if(((checkval[1][1]==-1)&&(checkval[2][2]==-1)&&(checkval[3][3]==-1))||((checkval[3][1]==-1)&&(checkval[2][2]==-1)&&(checkval[1][3]==-1))){
+    if(((checkval[0][0]==-1)&&(checkval[1][1]==-1)&&(checkval[2][2]==-1))||((checkval[2][0]==-1)&&(checkval[1][1]==-1)&&(checkval[0][2]==-1))){
         val = 0;
     }
 
     return val;
 }
-
 // checks the state array if the given state already exist or not
 float getVal(state s){
 	for (int i = 0; i < stateArray.size(); i++) {
@@ -88,25 +92,26 @@ float getVal(state s){
 	return getValUnknown(s.mat);
 }
 
-void equate(state const &state1, state &state2) {
-	for (int i = 0; i < state1.size(); i++) {
-		for (int j = 0; j < state1.size(); j++) {
+void equate(state &state1, state &state2) {
+	for (int i = 0; i < state1.mat.size(); i++) {
+		for (int j = 0; j < state1.mat.size(); j++) {
 			state2.mat[i][j] = state1.mat[i][j];
 		}
 	}
 	state2.val = state1.val;
 }
 
-int spaceRandom(Matrix state[3][3]) {
-    int val=1;
-    for(int i=0;i<3;i++) {
-       for(int j=0;j<3;j++) {
-           if(state[i][j]!=0) {
-               val++;
-           }
-       }
-   }
-    return 10-val;
+int spaceRandom(Matrix state) {
+	int sz=s.mat.size();
+	int val=0;
+	for(int i=0;i<sz;i++) {
+		 for(int j=0;j<sz;j++) {
+				 if(s.mat[i][j]!=0) {
+						 val++;
+				 }
+		 }
+ 	}
+	return sz*sz-val;
 }
 
 //to get the random move from possible moves
@@ -116,7 +121,7 @@ int randomInput(int arr[], int size){
 }
 
 //to make the move i.e. to change the value from 0 to -1 for possible move
-void randomChanged(state const &S1, state &S2, int move, int player){
+void randomChanged(state &S1, state &S2, int move, int player){
 
 	int size = state.mat.size();
 	int moveX=move/size, moveY=move%size;
@@ -127,67 +132,90 @@ void randomChanged(state const &S1, state &S2, int move, int player){
 
 //the main function to call to decide random player's move.It will play the move by itself
 void randomMove(state const &S, state &S1, int player){
-    int space=spaceRandom(S.mat);
+		int space=spaceRandom(S);
+    int sz=S.mat.size();
     int i=0,j=0,index=0;
     int freespace[space];
-    for(i=0;i<3;i++){
-        for(j=0;j<3;j++){
+    for(i=0;i<sz;i++){
+        for(j=0;j<sz;j++){
             if(S.mat[i][j]==0){
-                freespace[index]=3*i+j;
+                freespace[index]=sz*i+j;
                 index++;
             }
         }
     }
     int move=randomInput(freespace,space);
-
     randomChanged(S, S1, move, player);
-    return ;
+		if (player == PLAYER_X) S1.val =getVal(S1);
+		return ;
 }
 
+// function to check status of game at certain state
+int GameOver(int state[3][3])
+{
+    //checking for 3 1s or 3 -1s in a row
+    for(int i=0;i<3;i++){
+        if((state[i][1]==PLAYER_X)&&(state[i][2]==PLAYER_X)&&(state[i][3]==PLAYER_X)){
+            return WIN;
+        }
 
-void nextState (state const &currState, state &nextState, int policy, int player){
+        if((state[i][1]==PLAYER_O)&&(state[i][2]==PLAYER_O)&&(state[i][3]==PLAYER_O)){
+            return LOSE;
+        }
+    }
+
+    //checking for 3 1s or 3 -1s in a column
+    for(int i=0;i<3;i++){
+        if((state[1][i]==PLAYER_X)&&(state[2][i]==PLAYER_X)&&(state[3][i]==PLAYER_X)){
+            return WIN;
+        }
+
+        if((state[3][i]==PLAYER_O)&&(state[2][i]==PLAYER_O)&&(state[3][i]==PLAYER_O)){
+            return LOSE;
+        }
+    }
+    //checking for 3 1s in both the diagonals and return 1 for win
+    if(((state[1][1]==PLAYER_X)&&(state[2][2]==PLAYER_X)&&(state[3][3]==PLAYER_X))||((state[3][1]==PLAYER_X)&&(state[2][2]==PLAYER_X)&&(state[1][3]==PLAYER_X))){
+        return WIN;
+    }
+    //checking for 3 1s in both the  and return 0 for lose
+    if(((state[1][1]==PLAYER_O)&&(state[2][2]==PLAYER_O)&&(state[3][3]==PLAYER_O))||((state[3][1]==PLAYER_O)&&(state[2][2]==PLAYER_O)&&(state[1][3]==PLAYER_O))){
+        return LOSE;
+    }
+    int vacancy=spaceRandom();
+    if(vacancy==0){
+          return DRAW;    //4 stands for draw
+   }
+
+    return 2; //2 stands for game not over
+
+}
+
+void nextMove (state &currState, state &nextState, int policy, int player){
 
 	float largestValue = 0;
-	state dummyState;
-	if (policy == 1){
-		for (int i = 0; i < 3; i++) {
-                	for (int j = 0; j < 3; j++) {
-                        	if (currState.mat[i][j] == 0){
-                                	equate(currState, nextState);
-                                	nextState.mat[i][j] = 1;
-                                	nextState.val = getVal(nextState);
-                                	if (nextValue.val >= largestValue){
-                                        	largestValue = nextValue.val;
-                                        	equate(nextState, dummyState);
-                                	}
-                        	}
-                	}
-        	}
+	int greedSize = currState.mat.size();
+	state dummyState(greedSize);
+	if (policy == GREEDY){
+		for (int i = 0; i < greedSize; i++) {
+			for (int j = 0; j < greedSize; j++) {
+				if (currState.mat[i][j] == 0){
+					equate(currState, nextState);
+					nextState.mat[i][j] = 1;
+					nextState.val = getVal(nextState);
+					if (nextValue.val >= largestValue){
+						largestValue = nextValue.val;
+						equate(nextState, dummyState);
+					}
+				}
+			}
+		}
 		equate(dummyState, nextState);
 	}
 
 	else {
 		randomMove(currState, nextState, player);
 	}
-}
-
-
-
-int last_to_act(state prevState){
-	int count_x = 0;
-	int count_o = 0;
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++){
-			if (prevState.mat[i][j] == 1) count_x++;
-			else if (prevState.mat[i][j] == -1) count_o++;
-		 }
-	}
-
-	if (count_x == count_o) return -1;
-	else if (count_x == (count_0 + 1)) return 1;
-
-	return 0;
 }
 
 int getStateIndex(state &State){
@@ -200,15 +228,16 @@ int getStateIndex(state &State){
 
 }
 
-void backUp(state &prevState, state &currState)
-	// assuming prevState and currState has already been pushed in the stateArray
+void backUp(state &prevState, state &currState, float alpha){ // assuming prevState and currState has already been pushed in the stateArray
 	prevState.val = prevState.val + alpha*(currState.val - prevState.val);
 }
 
 void pushBack(state const &S){
-	state S = new state(3);
-	equate(S1, S);
-	stateArray.push_back(S);
+
+	int greedSize = S.mat.size();
+	state S1(greedSize);
+	equate(S, S1);
+	stateArray.push_back(S1);
 }
 
 bool alreadyExist(state S){
@@ -218,11 +247,11 @@ bool alreadyExist(state S){
 	return true;
 }
 
-void playGame(float epsilon){ // plays a game, objective is to update the stateArray and value function table
+void playGame(float epsilon, float alpha, int greedSize){ // plays a game, objective is to update the stateArray and value function table
 
-	state oState = new state(3);
-	state xstate = new state(3);
-	state dummyState = new state(3);
+	state oState(greedSize);
+	state xState(greedSize);
+	state dummyState(greedSize);
 
 	int turns = int (1/epsilon);
 	int j = 0;
@@ -230,36 +259,37 @@ void playGame(float epsilon){ // plays a game, objective is to update the stateA
 	while(1){
 
 		j++;
-		if (!j%turns) policy = 1;
-		nextState(oState, xState, policy, 1);
+		if (!j%turns) policy = EXPLORATORY;
+		else policy = GREEDY;
+		nextState(oState, xState, policy, PLAYER_X);
 		if (!alreadyExist(xState)) pushBack(xState);
 		int i = getStateIndex(dummyState);
-		if (i != -1) backUp(stateArray[i], xState);
-		if (GameOver(xState)) break;
-		equate(dummyState, xState);
-		nextState(xState, oState, 0, 0);
-		if (GameOver(oState)) break;
+		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], xState, alpha);
+		if ((GameOver(xState) == WIN)||(GameOver(xState) == LOSE)||(GameOver(xState == DRAW))) break;
+		equate(xState, dummyState);
+		nextState(xState, oState, EXPLATORY, PLAYER_O);
+		if ((GameOver(oState) == WIN)||(GameOver(oState) == LOSE)||(GameOver(oState == DRAW))) break;
 
 	}
 }
 
-bool game(){ // only plays not update, output will be win or loose
+int game(int greedSize){ // only plays not update, output will be win or loose
 
-	state oState = new state(3);
-	state xstate = new state(3);
+	state oState(greedSize);
+	state xState(greedSize);
 
 	while(1){
 
-		nextState(oState, xState, 1, 1);
-		if (GameOver(xState)) return true;
-		nextState(xState, oState, 0, 0);
-		if (GameOver(oState)) return false;
+		nextState(oState, xState, GREEDY, PLAYER_X);
+		if ((GameOver(xState) == WIN)||(GameOver(xState) == LOSE)||(GameOver(xState == DRAW))) return GameOver(xState);
+		nextState(xState, oState, GREEDY, PLAYER_O);
+		if ((GameOver(oState) == WIN)||(GameOver(oState) == LOSE)||(GameOver(oState == DRAW))) return GameOver(oState);
 
 	}
 
 }
 
-int main(int argc, char **argv){
+/*int main(int argc, char **argv){
 
 	int gamesCount = 0;
 	int gamesWin=0,gamesDraw=0,gamesLose=0;
@@ -279,20 +309,51 @@ int main(int argc, char **argv){
 		playGame(gameCondition);
 		if(gameCondition==1){      //function GameOver will return 1 if won
 			gamesWin++;
-			fout << "Game No:"<<gamesCount<<" Result:Won"<<endl;
+			fout << "Game No. : "<<gamesCount<<" Result : Won"<<endl;
 		}
 		if(gameCondition==0){ //function GameOver will return 0 if loose
 			gamesLose++;
-			fout << "Game No:"<<gamesCount<<" Result:Lost"<<endl;
+			fout << "Game No. : "<<gamesCount<<" Result : Lost"<<endl;
 		}
 		if(gameCondition==4) {//function GameOver will return 4 if draw
 			gamesDraw++;
-			fout << "Game No:"<<gamesCount<<" Result:Draw"<<endl;
+			fout << "Game No. : "<<gamesCount<<" Result : Draw"<<endl;
 		}
 		if(gamesCount>=100){
 
 		}
 	}
 	fout.close();
+	return 0;
+
+}	*/
+
+int main(){
+
+	float epsilon, alpha;
+	int greedSize;
+	std::cin >> epsilon;
+	std::cin >> alpha;
+	std::cin >> greedSize;
+
+	int winPercent[1000];
+	int gamesWin = 0;
+	int gamesDraw = 0;
+	int gamesLose = 0;
+
+	for (int i = 0; i < 10000; i++) {
+		playGame(epsilon, alpha, greedSize);
+		for (int j = 0; j < 100; j++) {
+
+			int gameResult = game(greedSize);
+			if (gameResult == WIN) gamesWin++;
+			else if (gameResult == LOSE) gamesLose++;
+			else if (gameResult == DRAW) gamesDraw++;
+
+		}
+		winPercent[i] = gamesWin;
+	}
+
+	return 0;
 
 }
