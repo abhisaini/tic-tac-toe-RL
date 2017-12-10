@@ -1,9 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <cstdlib>
+#include <bits/stdc++.h>
 #define GREEDY 0
 #define EXPLORATORY 1
 #define PLAYER_X 1
@@ -45,51 +40,54 @@ bool compareMatrices(Matrix mat1, Matrix mat2){
 std::vector<state> stateArray;
 
 //function to check value of states which are not stored
-float getValUnknown(Matrix checkval)
-{
-	int sz=arr.size();
+/********************************************************************************************
+**********************************************************************************************/
+float getValUnknown(Matrix arr)
+{   int sz=arr.size();
 	float val=0.5;
+    //checking for sz 1s or sz -1s in every row
+    for(int i=0;i<sz;i++){
+        int sum=0;
+        for(int j=0;j<sz;j++){
+            sum=sum+arr[i][j];
+        }
+        if(sum==sz){
+            return 1;
+        }
+        if(sum==-sz){
+            return 0;
+        }
+    }
 
-	//checking for sz 1s or sz -1s in every row
-	for(int i = 0; i < sz; i++){
-		int sum = 0;
-		for(int j = 0; j < sz; j++){
-					sum = sum + arr[i][j];
-		}
-		if (sum == sz){
-			return 1;
-		}
-		if(sum == -sz){
-			return 0;
-		}
-	}
-
-	//checking for sz 1s or sz -1s in a column
-	for(int i = 0; i < sz; i++){
-		int sum = 0;
-		for(int j = 0; j < sz; j++){
-			sum = sum + arr[j][i];
-		}
-		if(sum == sz){
-			return 1;
-		}
-		if(sum == -sz){
-			return 0;
-		}
-	}
+    //checking for sz 1s or sz -1s in a column
+    for(int i=0;i<sz;i++){
+        int sum=0;
+        for(int j=0;j<sz;j++){
+            sum=sum+arr[j][i];
+        }
+        if(sum==sz){
+            return 1;
+        }
+        if(sum==-sz){
+            return 0;
+        }
+    }
 
 
-	//checking sz 1s or -1s in  diagonal
-	int sumd1 = 0, sumd2 = 0;
-	for(int i = 0; i < sz; i++){
-		sumd1 = sumd1 + arr[i][i];
-		sumd2 = sumd2 + arr[i][sz-1-i];
-	}
-	if(sumd1 == sz||sumd2 == sz) return 1;
-	if(sumd1 == sz||sumd2 == sz) return 0;
+    //checking sz 1s or -1s in  diagonal
+    int sumd1=0,sumd2=0;
+    for(int i=0;i<sz;i++){
+        sumd1=sumd1+arr[i][i];
+        sumd2=sumd2+arr[i][sz-1-i];
+    }
+    if(sumd1==sz||sumd2==sz) return 1;
+    if(sumd1==sz||sumd2==sz) return 0;
 
-	return val;
+
+    return val;
 }
+/**********************************************************************************************************
+***********************************************************************************************************/
 
 // checks the state array if the given state already exist or not
 float getVal(state s){
@@ -109,39 +107,43 @@ void equate(state &state1, state &state2) {
 	}
 	state2.val = state1.val;
 }
-
-int spaceRandom(Matrix state) {
-	int sz=s.mat.size();
-	int val=0;
-	for(int i=0;i<sz;i++) {
-		 for(int j=0;j<sz;j++) {
-				 if(s.mat[i][j]!=0) {
-						 val++;
-				 }
-		 }
- 	}
-	return sz*sz-val;
+//the below snippet represents function randomMove(),whose input are a const state state1,a state state 2,player(1 or -1).And the function will change state2 such that state2 is next random move for state1 and player given
+/******************************************************************************************************************************
+********************************************************************************************************************************/
+//will return possible space at any state and takes state as input
+int spaceRandom(state const &s) {
+    int sz=s.mat.size();
+    int val=0;
+    for(int i=0;i<sz;i++) {
+       for(int j=0;j<sz;j++) {
+           if(s.mat[i][j]!=0) {
+               val++;
+           }
+       }
+   }
+    return sz*sz-val;
 }
 
-//to get the random move from possible moves
-int randomInput(int arr[], int size){
-    int input=rand()%size;
+//function will take the array containing the position of vacancies as input and returns a random vacancy
+int randomInput(int arr[], int length){
+    int input=rand()%length;
     return arr[input];
 }
 
-//to make the move i.e. to change the value from 0 to -1 for possible move
-void randomChanged(state &S1, state &S2, int move, int player){
+//it will make the move i.e it takes the state,vacancy and player(1 or -1) as input and changes the vacancy to player
+void randomChanged(state const &S1, state &S2, int move, int player){
 
-	int size = state.mat.size();
-	int moveX=move/size, moveY=move%size;
-	equate(S1, S2);
-  S2.mat[moveX][moveY]= player;
+	int sz = S1.mat.size();
+	int moveX=move/sz, moveY=move%sz;
+    equate(S1, S2);
+
+    S2.mat[moveX][moveY]= player;
   return;
 }
 
-//the main function to call to decide random player's move.It will play the move by itself
+
 void randomMove(state const &S, state &S1, int player){
-		int space=spaceRandom(S);
+    int space=spaceRandom(S);
     int sz=S.mat.size();
     int i=0,j=0,index=0;
     int freespace[space];
@@ -154,51 +156,31 @@ void randomMove(state const &S, state &S1, int player){
         }
     }
     int move=randomInput(freespace,space);
+
     randomChanged(S, S1, move, player);
-		if (player == PLAYER_X) S1.val =getVal(S1);
-		return ;
+    return ;
 }
 
-// function to check status of game at certain state
-int GameOver(int state[3][3])
-{
-    //checking for 3 1s or 3 -1s in a row
-    for(int i=0;i<3;i++){
-        if((state[i][1]==PLAYER_X)&&(state[i][2]==PLAYER_X)&&(state[i][3]==PLAYER_X)){
-            return WIN;
-        }
+/******************************************************************************************************************************
+********************************************************************************************************************************/
 
-        if((state[i][1]==PLAYER_O)&&(state[i][2]==PLAYER_O)&&(state[i][3]==PLAYER_O)){
-            return LOSE;
-        }
-    }
 
-    //checking for 3 1s or 3 -1s in a column
-    for(int i=0;i<3;i++){
-        if((state[1][i]==PLAYER_X)&&(state[2][i]==PLAYER_X)&&(state[3][i]==PLAYER_X)){
-            return WIN;
-        }
 
-        if((state[3][i]==PLAYER_O)&&(state[2][i]==PLAYER_O)&&(state[3][i]==PLAYER_O)){
-            return LOSE;
-        }
-    }
-    //checking for 3 1s in both the diagonals and return 1 for win
-    if(((state[1][1]==PLAYER_X)&&(state[2][2]==PLAYER_X)&&(state[3][3]==PLAYER_X))||((state[3][1]==PLAYER_X)&&(state[2][2]==PLAYER_X)&&(state[1][3]==PLAYER_X))){
-        return WIN;
-    }
-    //checking for 3 1s in both the  and return 0 for lose
-    if(((state[1][1]==PLAYER_O)&&(state[2][2]==PLAYER_O)&&(state[3][3]==PLAYER_O))||((state[3][1]==PLAYER_O)&&(state[2][2]==PLAYER_O)&&(state[1][3]==PLAYER_O))){
-        return LOSE;
-    }
-    int vacancy=spaceRandom();
-    if(vacancy==0){
-          return DRAW;    //4 stands for draw
-   }
-
-    return 2; //2 stands for game not over
+//Must be placed below functions spaceRandom and getValUnknown
+//input will be the state
+//will return 1 for win,0 for loose,2 for game not over,4 for draw
+/************************************************************************************
+***************************************************************************************/
+int gameOver(state &arr){
+    float val=getValUnknown(arr.mat);
+    int vacancy=spaceRandom(arr);
+    if(vacancy==0&&val==0.5) return 4; //4 stands for draw
+    if(val!=0.5) return val;//will return 0 if lost and 1 if won;
+    else if(vacancy>0&&val==0.5) return 2;//2 stands for game not over yet
 
 }
+/******************************************************************************************************
+*****************************************************************************************************/
 
 void nextMove (state &currState, state &nextState, int policy, int player){
 
