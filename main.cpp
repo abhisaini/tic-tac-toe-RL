@@ -193,15 +193,25 @@ int GameOver(state &arr){
     else if(vacancy>0&&val==0.5) return 2;//2 stands for game not over yet
 
 }
+string OX(int a){
+	string empty=" ",xOccupied="x",oOccupied="o";
+	if (a==0) return empty;
+	if (a==1) return xOccupied;
+	if (a==-1) return oOccupied;
+	else return to_string(a);
+}
 /******************************************************************************************************
 *****************************************************************************************************/
 
 void printMat(int gridSize, Matrix mat){
     for (int i = 0; i < gridSize; i++){
         for (int j = 0; j < gridSize; j++){
-            cout << mat[i][j] << " ";
+            cout << OX(mat[i][j]);
+			if(j<gridSize-1){
+				 cout<< " | ";
+			}
         }
-        cout << " " << endl;
+        if(i<gridSize-1) cout << "______________________" << endl;
     }
 
     cout << "-----------------------" << endl;
@@ -358,6 +368,101 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 
 }
 
+//To Play against human
+/*****************************************************************************
+*******************************************************************************/
+void viewArena(int gridSize){
+	cout<<"Here is ur field :)"<<endl;
+    for (int i = 0; i < gridSize; i++){
+        for (int j = 0; j < gridSize; j++){
+            cout << i*gridSize+j+1;
+			if(j<gridSize-1){
+				 cout<< " | ";
+			}
+        }
+        if(i<gridSize-1) cout << "______________________" << endl;
+    }
+
+    cout << "-----------------------" << endl;
+}
+
+
+
+void humanInput(state &S1, state &S2,int gridSize){
+	int move;
+	cout<<"choose ur move between 1 to " + to_string( gridSize)<<endl;
+	cout<<"Please dont choose the space occupied by X"<<endl;
+	cin>>move;
+	move--;
+	int sz = S1.mat.size();
+	int moveX=move/sz, moveY=move%sz;
+    equate(S1, S2);
+
+    S2.mat[moveX][moveY]= -1;
+  return;
+}
+
+
+
+int humanPlay(int gridSize){ // only plays not update, output will be win or loose
+
+	state oState(gridSize);
+	state xState(gridSize);
+	viewArena(gridSize);
+	while(1){
+		cout<<"Learner's Move :"<<endl;
+		nextMove(oState, xState, GREEDY, PLAYER_X);
+		printMat(gridSize, xState.mat);
+		//
+		if ((GameOver(xState) == WIN)){
+
+
+				cout<<"Learner Won"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+		if ((GameOver(xState) == DRAW)){
+
+
+				cout<<" It's a Draw"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+		if ((GameOver(xState) == LOSE)){
+
+
+				cout<<"Learner Lost,You Won"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+		cout<<"Your Move :"<<endl;
+		humanInput(xState, oState,gridSize);
+		printMat(gridSize, oState.mat);
+		//
+		if ((GameOver(oState) == WIN)){
+
+
+				cout<<"Learner Lost,You won"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+		if ((GameOver(oState) == DRAW)){
+
+
+				cout<<" It's a Draw"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+		if ((GameOver(oState) == LOSE)){
+
+
+				cout<<"Learner Won,You Lost"<<endl;// printMat(gridSize, xState.mat);
+		    return 0;
+		}
+
+
+	}
+
+}
+
+
+
+
 
 //Below snippet plotts the graphs
 /*************************************************************************************
@@ -455,14 +560,29 @@ int main(int argc, char **argv){
         notLost.push_back(100*( gamesDraw/checkCount + gamesWin/checkCount) );
         lostPercent.push_back(100*gamesLose/checkCount);
 		Trainings.push_back(i);
-		cout<<i<<"th training :=  Win Percent : "<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
-		fout<<i<<"th training :=  Win Percent :"<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
+		int p=trains/1000;
+		if(i%p==0){
+			cout<<i<<"th training :=  Win Percent : "<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
+			fout<<i<<"th training :=  Win Percent :"<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
+		}
 	}
+
 
 	plotGraph(Trainings,winPercent,drawPercent,notLost,lostPercent,plotfileName);
 	fout.close();
 	cout<<"And the stats are stored in file named : "<<textfileName<<endl;
+	cout<<"Wanna play with learner ??"<<endl;
+	int humanGameCount=1;
+	while(humanGameCount){
+		cout<<"Hey do u want to play with me :)"<<endl;
+		string humansChoice;
+		cout<<"Please reply with yes/no"<<endl;
+		cin>>humansChoice;
+		if(humansChoice=="yes") humanPlay(gridSize);
+		else humanGameCount--;
+	}
 
  return 0;
 
 }
+
