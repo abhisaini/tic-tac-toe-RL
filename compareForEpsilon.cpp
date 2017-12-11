@@ -363,9 +363,11 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 //the below function gives destination for plotting image
 
 string plotFile(){
-	string epsilon, alpha,gridSize,trains,checkCount;
-	cout<<"What was the epsilon ?"<<endl;
-	std::cin >> epsilon;
+	string epsilon1,epsilon2, alpha,gridSize,trains,checkCount;
+	cout<<"What was  epsilon 1 ?"<<endl;
+	std::cin >> epsilon1;
+	cout<<"What was  epsilon 2 ?"<<endl;
+	std::cin >> epsilon2;
 	cout<<"Enter the Alpha again :-)"<<endl;
 	std::cin >> alpha;
 	cout<<"What was the size of tic-tac-toe?"<<endl;
@@ -375,24 +377,24 @@ string plotFile(){
 	std::cout << "Enter value of checkCount again :-)" << '\n';
 	std::cin >> checkCount;
 
-    string plotfile =
-    "Results/Grid-" + gridSize+ "/ Alpha-"+alpha+"_Epsilon-" +epsilon + "_Trainings-"
+    string fileName =
+    "Results/Grid-" + gridSize+ "/ Alpha-"+alpha+"_Ep1-" +epsilon2 +"_Ep1-" +epsilon2 + "_Trainings-"
     + trains + "CheckCount" +checkCount;
-
-    return plotfile;
+    cout<<fileName;
+    return fileName;
 }
 
 //function to plot the graphs;
-void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent,std::vector<float> drawPercent,std::vector<float> notLost,std::vector<float> lostPercent,string plotfileName){
-	string plotTitle="Percent vs Trains \n"+plotfileName;
+void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent1,std::vector<float> lostPercent1,std::vector<float> winPercent2,std::vector<float> lostPercent2,string plotfileName,string plotTitle){
 	using namespace plt;
-	named_plot("Draw",Trainings,drawPercent,"pink");
-	named_plot("Win",Trainings,winPercent,"r");
-	named_plot( "Win+Draw",Trainings,notLost,"b--");
-	named_plot("Lost",Trainings,lostPercent,"g--");
-	legend();
-	ylim(-5, 105);
-	title(plotTitle);
+	named_plot("Win-1",Trainings,winPercent1,"b--");
+	named_plot("Win-2",Trainings,winPercent2,"g");
+	named_plot( "Lost-1",Trainings,lostPercent1 ,"r--");
+	named_plot("Lost-2",Trainings,lostPercent2);
+	//legend();
+	ylim(0, 100);
+    plotTitle="Percent vs Trains \n "+plotfileName;
+	title("Percent vs Trains  ");
 	save(plotfileName);
 	cout<<"The Graph is stored in file named : "<<plotfileName<<endl;
 
@@ -405,12 +407,13 @@ void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent,std::v
 int main(int argc, char **argv){
 
 
-	float epsilon, alpha;
+	float epsilon1,epsilon2, alpha;
 	int gridSize,trains;
 	float checkCount;
-	cout<<"What epsilon u want,choose any number between 0 to 1 : "<<endl
-	<<"But for better training prefer lesser value of epsilon"<<endl;
-	std::cin >> epsilon;
+	cout<<"What 1st epsilon to compare,choose any number between 0 to 1 : "<<endl;
+	std::cin >> epsilon1;
+    cout<<"What 2nd epsilon to compare,choose any number between 0 to 1 : "<<endl;
+	std::cin >> epsilon2;
 	cout<<"What alpha u want,choose any number between 0 to 1"<<endl;
 	std::cin >> alpha;
 	cout<<"choose gridsize of tic-tac-toe"<<endl;
@@ -423,19 +426,21 @@ int main(int argc, char **argv){
 	cout<<"Please enter the data again that u entered now !"<<endl;
 
 
-	std::vector<float> winPercent;
-	std::vector<float> drawPercent;
+	std::vector<float> winPercent1;
+	std::vector<float> winPercent2;
 	std::vector<float> Trainings;
-	std::vector<float> notLost;
-	std::vector<float> lostPercent;
-	string fileName=plotFile();
-	string plotfileName = "Plot-" + fileName + ".png";
-	string textfileName = "Text-" + fileName + ".txt";
+	std::vector<float> lostPercent1;
+	std::vector<float> lostPercent2;
+	string fileName=plotFile(),plotTitle;
+    string plotfileName = "Plot-CompEp-" + fileName + ".png";
+    string textfileName = "Text-CompEp-" + fileName + ".txt";
 	ofstream fout(textfileName.c_str());
-	fout<<"No of Trainings | Percentage";
+    fout<<"**********EPSILON1***************"<<endl;
+    fout<<"___________________________________"<<endl;
+	fout<<"No of Trainings | Percentage"<<endl;
 
 	for (int i = 0; i < trains; i++) {
-		playGame(epsilon, alpha, gridSize);
+		playGame(epsilon1, alpha, gridSize);
         float gamesWin = 0;
       	float gamesDraw = 0;
       	float gamesLose = 0;
@@ -447,16 +452,45 @@ int main(int argc, char **argv){
 			else if (gameResult == DRAW) gamesDraw++;
 
 		}
-        winPercent.push_back(100*gamesWin/checkCount);
-		drawPercent.push_back(100*gamesDraw/checkCount);
-        notLost.push_back(100*( gamesDraw/checkCount + gamesWin/checkCount) );
-        lostPercent.push_back(100*gamesLose/checkCount);
+        winPercent1.push_back(100*gamesWin/checkCount);
+        lostPercent1.push_back(100*gamesLose/checkCount);
 		Trainings.push_back(i);
-		cout<<i<<"th training :=  Win Percent : "<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
-		fout<<i<<"th training :=  Win Percent :"<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<" | Lost Percent :"<<lostPercent[i]<<endl;
+		cout<<"Ep1"<<i<<"th training :=  Win Percent : "<<winPercent1[i]<<" | Lost Percent :"<<lostPercent1[i]<<endl;
+		fout<<"Ep1"<<i<<"th training :=  Win Percent :"<<winPercent1[i]<<" | Lost Percent :"<<lostPercent1[i]<<endl;
 	}
 
-	plotGraph(Trainings,winPercent,drawPercent,notLost,lostPercent,plotfileName);
+    stateArray.clear();
+
+    fout<<"**********EPSILON1***************"<<endl;
+    fout<<"___________________________________"<<endl;
+    fout<<"No of Trainings | Percentage"<<endl;
+
+    for (int i = 0; i < trains; i++) {
+        playGame(epsilon2, alpha, gridSize);
+        float gamesWin = 0;
+        float gamesDraw = 0;
+        float gamesLose = 0;
+        for (int j = 0; j < int(checkCount); j++) {
+
+            int gameResult = game(gridSize);
+            if (gameResult == WIN) gamesWin++;
+            else if (gameResult == LOSE) gamesLose++;
+            else if (gameResult == DRAW) gamesDraw++;
+
+        }
+        winPercent2.push_back(100*gamesWin/checkCount);
+        lostPercent2.push_back(100*gamesLose/checkCount);
+        Trainings.push_back(i);
+        cout<<"Ep2"<<i<<" th training :=  Win Percent : "<<winPercent2[i]<<" | Lost Percent :"<<lostPercent2[i]<<endl;
+        fout<<"Ep2"<<i<<" th training :=  Win Percent :"<<winPercent2[i]<<" | Lost Percent :"<<lostPercent2[i]<<endl;
+    }
+
+
+
+
+
+
+	plotGraph(Trainings,winPercent1,lostPercent1,winPercent2,lostPercent2,plotfileName,plotTitle);
 	fout.close();
 	cout<<"And the stats are stored in file named : "<<textfileName<<endl;
 
