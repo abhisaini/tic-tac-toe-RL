@@ -1,0 +1,10 @@
+No of Trainings | Percentage0th training :=  Win Percent :0.8 | Draw Percent :0.14
+1th training :=  Win Percent :0.78 | Draw Percent :0.14
+2th training :=  Win Percent :0.84 | Draw Percent :0.1
+3th training :=  Win Percent :0.81 | Draw Percent :0.12
+4th training :=  Win Percent :0.79 | Draw Percent :0.09
+5th training :=  Win Percent :0.87 | Draw Percent :0.11
+6th training :=  Win Percent :0.87 | Draw Percent :0.09
+7th training :=  Win Percent :0.83 | Draw Percent :0.12
+8th training :=  Win Percent :0.87 | Draw Percent :0.11
+9th training :=  Win Percent :0.86 | Draw Percent :0.09

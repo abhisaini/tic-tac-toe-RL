@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include "matplotlibcpp.h"  //library for plotting
 #define GREEDY 0
 #define EXPLORATORY 1
 #define PLAYER_X 1
@@ -9,7 +10,8 @@
 #define DRAW 4
 
 using namespace std;
-
+namespace plt = matplotlibcpp; //namespace for plotting
+typedef std::vector<int> Vector;
 typedef std::vector<std::vector<int> > Matrix;
 
 class state {
@@ -354,78 +356,109 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 
 }
 
+
+//Below snippet plotts the graphs
+/*************************************************************************************
+****************************************************************************************/
+//the below function gives destination for plotting image
+
+string plotFile(){
+	string epsilon, alpha,gridSize,trains,checkCount;
+	cout<<"What was the epsilon ?"<<endl;
+	std::cin >> epsilon;
+	cout<<"Enter the Alpha again :-)"<<endl;
+	std::cin >> alpha;
+	cout<<"What was the size of tic-tac-toe?"<<endl;
+	std::cin >> gridSize;
+	cout<<"How many times you trained the Agent?"<<endl;
+	std::cin >> trains;
+	std::cout << "Enter value of checkCount again :-)" << '\n';
+	std::cin >> checkCount;
+
+    string plotfile =
+    "Results/Grid-" + gridSize+ "/ Alpha-"+alpha+"_Epsilon-" +epsilon + "_Trainings-"
+    + trains + "CheckCount" +checkCount;
+
+    return plotfile;
+}
+
+//function to plot the graphs;
+void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent,std::vector<float> drawPercent,std::vector<float> notLost,std::vector<float> lostPercent,string plotfileName){
+	using namespace plt;
+	named_plot("Draw",Trainings,drawPercent,"pink");
+	named_plot("Win",Trainings,winPercent,"r");
+	named_plot( "Win+Draw",Trainings,notLost,"b--");
+	named_plot("Lost",Trainings,lostPercent,"g--");
+	legend();
+	ylim(0, 100);
+	title("PERCENTAGE vs No of Trainings");
+	save(plotfileName);
+	cout<<"The Graph is stored in file named : "<<plotfileName<<endl;
+
+}
+
+/*************************************************************************************
+****************************************************************************************/
+
+
 int main(int argc, char **argv){
 
-    for(int i = 0; i < 2800; i++){
-        playGame(1, 0.3, 3);
-    }
-    cout << stateArray.size() << endl;
-    cout << win << endl;
-    cout << loss << endl;
-    cout << draw << endl;
 
- /*int sz=stateArray.size();
- for (int i = 0; i < sz; i++)
-    cout << stateArray[i].val << endl;
- */
-    int winPercent;
-    int gamesWin = 0;
-	int gamesDraw = 0;
-	int gamesLose = 0;
-
-    for (int i = 0; i < 100; i++){
-        int gameResult = game(3);
-	    if (gameResult == WIN) gamesWin++;
-	    else if (gameResult == LOSE) gamesLose++;
-	    else if (gameResult == DRAW) gamesDraw++;
-
-    }
-    cout << "WINS : " << gamesWin <<"," << "Loses : " << gamesLose + gamesDraw << endl;
+	float epsilon, alpha;
+	int gridSize,trains;
+	float checkCount;
+	cout<<"What epsilon u want,choose any number between 0 to 1 : "<<endl
+	<<"But for better training prefer lesser value of epsilon"<<endl;
+	std::cin >> epsilon;
+	cout<<"What alpha u want,choose any number between 0 to 1"<<endl;
+	std::cin >> alpha;
+	cout<<"choose gridsize of tic-tac-toe"<<endl;
+	std::cin >> gridSize;
+	cout<<"How many times do you want to train the Agent"<<endl;
+	std::cin >> trains;
+	cout<<"For how many games u want to calculate probablity after each Training i.e checkCount :"<<endl;
+	cout<<"Don't choose an integer which exceeds 100"<<endl;
+	std::cin >> checkCount;
+	cout<<"Please enter the data again that u entered now !"<<endl;
 
 
- /*state S0(3);
- state S1(3);
- state S2(3);
- state S3(3);
- state S4(3);
- state S5(3);
- state S6(3);
+	std::vector<float> winPercent;
+	std::vector<float> drawPercent;
+	std::vector<float> Trainings;
+	std::vector<float> notLost;
+	std::vector<float> lostPercent;
+	string fileName=plotFile();
+	string plotfileName = "Plot-" + fileName + ".png";
+	string textfileName = "Text-" + fileName + ".txt";
+	ofstream fout(textfileName.c_str());
+	fout<<"No of Trainings | Percentage";
 
- S0.mat[0][0] = 1;
- S0.mat[2][2] = -1;
+	for (int i = 0; i < trains; i++) {
+		playGame(epsilon, alpha, gridSize);
+        float gamesWin = 0;
+      	float gamesDraw = 0;
+      	float gamesLose = 0;
+		for (int j = 0; j < int(checkCount); j++) {
 
- equate(S0,S1);
- equate(S0,S2);
- equate(S0,S3);
- equate(S0,S4);
- equate(S0,S5);
- equate(S0,S6);
+			int gameResult = game(gridSize);
+			if (gameResult == WIN) gamesWin++;
+			else if (gameResult == LOSE) gamesLose++;
+			else if (gameResult == DRAW) gamesDraw++;
 
- S1.mat[0][2] = 1;
- S1.val = 0.9;
- S2.mat[2][0] = 1;
- S2.val = 0.9;
- S3.mat[1][1] = 1;
- S3.val = 0.85;
- S4.mat[0][1] = 1;
- S4.val = 0.9;
- S5.mat[1][0] = 1;
- S5.val = 0.9;
- S6.mat[2][1] = 1;
- S6.val = 0.9;
+		}
+        winPercent.push_back(100*gamesWin/checkCount);
+		drawPercent.push_back(100*gamesDraw/checkCount);
+        notLost.push_back(100*( gamesDraw/checkCount + gamesWin/checkCount) );
+        lostPercent.push_back(100*gamesLose/checkCount);
+		Trainings.push_back(i);
+		cout<<i<<"th training :=  Win Percent : "<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<endl;
+		fout<<i<<"th training :=  Win Percent :"<<winPercent[i]<<" | Draw Percent :"<<drawPercent[i]<<endl;
+	}
 
- stateArray.push_back(S1);
- stateArray.push_back(S2);
- stateArray.push_back(S3);
- stateArray.push_back(S4);
- stateArray.push_back(S5);
- stateArray.push_back(S6);
+	plotGraph(Trainings,winPercent,drawPercent,notLost,lostPercent,plotfileName);
+	fout.close();
+	cout<<"And the stats are stored in file named : "<<textfileName<<endl;
 
- state S7(3);
-
- nextMove(S0, S7,GREEDY,PLAYER_X);
-
- printMat(3, S7.mat);
- */return 0;
+ return 0;
 
 }
