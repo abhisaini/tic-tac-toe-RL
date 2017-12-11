@@ -385,11 +385,11 @@ string plotFile(){
 //function to plot the graphs;
 void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent1,std::vector<float> lostPercent1,std::vector<float> winPercent2,std::vector<float> lostPercent2,string plotfileName){
 	using namespace plt;
-	plot(Trainings,winPercent1,"b--");
-	plot(Trainings,winPercent2,"g");
-	plot( Trainings,lostPercent1 ,"r--");
-	plot(Trainings,lostPercent2),"pink";
-	//legend();
+	named_plot("Ep-1 Win",Trainings,winPercent1,"b--");
+	named_plot("Ep-2 Win",Trainings,winPercent2,"g");
+	named_plot( "Ep-1 Lost",Trainings,lostPercent1 ,"r--");
+	named_plot("Ep-2 Lost",Trainings,lostPercent2,"pink");
+	legend();
 	ylim(-5, 105);
 	title("Percent vs Trains \n Win-1 :blue -- | Win-2: green | Lost-1: red --| Lost-2: pink");
 	save(plotfileName);
@@ -407,7 +407,7 @@ int main(int argc, char **argv){
 	float epsilon1,epsilon2, alpha;
 	int gridSize,trains;
 	float checkCount;
-	cout<<"What 1st epsilon to compare,choose any number between 0 to 1 : "<<endl;
+	cout<<"What 1st epsilon to compare(Enter the higher epsilon first),choose any number between 0 to 1 : "<<endl;
 	std::cin >> epsilon1;
     cout<<"What 2nd epsilon to compare,choose any number between 0 to 1 : "<<endl;
 	std::cin >> epsilon2;
@@ -493,4 +493,3 @@ int main(int argc, char **argv){
  return 0;
 
 }
-
