@@ -11,4 +11,5 @@ How to Run/
 -----
 Clone the directory
 In terminal run following command
+
     g++ minimal.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
