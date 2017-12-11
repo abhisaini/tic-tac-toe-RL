@@ -132,11 +132,11 @@ int randomInput(int arr[], int length){
     int c = rand();
     int b = rand();
     int d = rand();
-   // d = rand();
-   // d = rand();
-   // d = rand();
- //   d = rand();
-// d = rand();
+    	d = rand();
+    	d = rand();
+    	d = rand();
+   	d = rand();
+	 	d = rand();
 
     int input=rand()%length;
     return arr[input];
@@ -170,7 +170,7 @@ void randomMove(state &S, state &S1, int player){
     int move=randomInput(freespace,space);
 
     randomChanged(S, S1, move, player);
-		if (player == PLAYER_X) S1.val = getVal(S1);
+		if (player == PLAYER_X) {S1.val = getVal(S1);}
     return;
 }
 
@@ -195,6 +195,17 @@ int GameOver(state &arr){
 }
 /******************************************************************************************************
 *****************************************************************************************************/
+
+void printMat(int gridSize, Matrix mat){
+    for (int i = 0; i < gridSize; i++){
+        for (int j = 0; j < gridSize; j++){
+            cout << mat[i][j] << " ";
+        }
+        cout << " " << endl;
+    }
+
+    cout << "-----------------------" << endl;
+}
 
 void nextMove (state &currState, state &nextState, int policy, int player){
 
@@ -295,10 +306,10 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 		if (epsilon)
 		{
 			j++;
-			if (!j%turns) policy = EXPLORATORY;
-			else policy = GREEDY;
+			if (!(j%turns)){ policy = EXPLORATORY;}
+			else {policy = GREEDY;}
 		}
-		else policy = GREEDY;
+		else {policy = GREEDY;}
 		nextMove(oState, xState, policy, PLAYER_X);
 		if (!alreadyExist(xState)) pushBack(xState);
 		int i = getStateIndex(dummyState);
@@ -309,25 +320,16 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 		    break;
 		}
 		equate(xState, dummyState);
-		j++;
+		//j++;
 		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
 		if ((GameOver(oState) == WIN)||(GameOver(oState) == LOSE)||(GameOver(oState) == DRAW)){
-		    loss++;
+				if (GameOver(oState)== LOSE){
+				loss++;}
+				else {draw++;}
 		    break;
 		}
 
 	}
-}
-
-void printMat(int gridSize, Matrix mat){
-    for (int i = 0; i < gridSize; i++){
-        for (int j = 0; j < gridSize; j++){
-            cout << mat[i][j] << " ";
-        }
-        cout << " " << endl;
-    }
-
-    cout << "-----------------------" << endl;
 }
 
 int game(int gridSize){ // only plays not update, output will be win or loose
@@ -400,6 +402,7 @@ void plotGraph(std::vector<float> Trainings,std::vector<float> winPercent,std::v
 
 /*************************************************************************************
 ****************************************************************************************/
+
 
 
 int main(int argc, char **argv){
