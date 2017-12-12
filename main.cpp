@@ -168,11 +168,7 @@ int GameOver(state &arr){
 }
 
 string OX(int a){
-<<<<<<< HEAD
-	string empty = " ", xOccupied = "x", oOccupied = "o";
-=======
 	string empty = "  ", xOccupied = " x", oOccupied = " o";
->>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 	if (a == 0) return empty;
 	if (a == 1) return xOccupied;
 	if (a == -1) return oOccupied;
