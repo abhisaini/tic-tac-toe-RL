@@ -168,7 +168,11 @@ int GameOver(state &arr){
 }
 
 string OX(int a){
+<<<<<<< HEAD
 	string empty = " ", xOccupied = "x", oOccupied = "o";
+=======
+	string empty = "  ", xOccupied = " x", oOccupied = " o";
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 	if (a == 0) return empty;
 	if (a == 1) return xOccupied;
 	if (a == -1) return oOccupied;
@@ -180,12 +184,21 @@ void printMat(int gridSize, Matrix mat){
         for (int j = 0; j < gridSize; j++){
             cout << OX(mat[i][j]);
 						if(j<gridSize-1){
+<<<<<<< HEAD
 				 			cout<< " | ";
 						}
         }
         if(i < gridSize - 1) cout << endl << "______________________" << endl;
     }
     cout <<endl<< "-----------------------" << endl;
+=======
+				 			cout<< " |";
+						}
+        }
+        if(i < gridSize - 1) cout << endl << "--------------------" << endl;
+    }
+    cout <<endl<< "___________________" << endl;
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 }
 
 void nextMove (state &currState, state &nextState, int policy, int player){
@@ -294,7 +307,11 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 		if (!alreadyExist(xState)) pushBack(xState);
 		int i = getStateIndex(dummyState);
 		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], xState, alpha);
+<<<<<<< HEAD
 		if ((gameRes == WIN)||gameRes == DRAW)) {
+=======
+		if ((gameRes == WIN)||(gameRes == DRAW)) {
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 		    if (GameOver(xState) == WIN) win++;
 		    else draw++;
 		    break;
@@ -302,7 +319,11 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 		equate(xState, dummyState);
 		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
 		gameRes = GameOver(oState);
+<<<<<<< HEAD
 		if (((gameRes == LOSE)||(gameRes == DRAW)) {
+=======
+		if ((gameRes == LOSE)||(gameRes == DRAW)) {
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 				if (GameOver(oState)== LOSE) loss++;
 				else draw++;
 		    break;
@@ -319,11 +340,19 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 
 		nextMove(oState, xState, GREEDY, PLAYER_X);
 		int gameRes = GameOver(xState);
+<<<<<<< HEAD
 		if ((gameRes == WIN)||gameRes == DRAW)) return gameRes;
 
 		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
 		gameRes = GameOver(oState);
 		if (((gameRes == LOSE)||(gameRes == DRAW)) return gameRes;
+=======
+		if ((gameRes == WIN)||(gameRes == DRAW)) return gameRes;
+
+		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
+		gameRes = GameOver(oState);
+		if ((gameRes == LOSE)||(gameRes == DRAW)) return gameRes;
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 
 	}
 }
@@ -335,12 +364,21 @@ void viewArena(int gridSize){
         for (int j = 0; j < gridSize; j++){
 					cout << i*gridSize+j+1;
 					if(j < gridSize - 1) {
+<<<<<<< HEAD
 				 		cout<< " | ";
 					}
         }
         if(i < gridSize - 1) cout << "______________________" << endl;
     }
     cout << "-----------------------" << endl;
+=======
+				 		cout<< " |";
+					}
+        }
+        if(i < gridSize - 1) cout << endl << "--------------------" << endl;
+    }
+    cout << endl<<"___________________" << endl;
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 }
 
 
@@ -358,15 +396,23 @@ void humanInput(state &S1, state &S2,int gridSize){
   return;
 }
 
+<<<<<<< HEAD
 int humanPlay(int gridSize){ // only plays not update, output will be win or loose
+=======
+void humanPlay(int gridSize){ // only plays not update, output will be win or loose
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 
 	state oState(gridSize);
 	state xState(gridSize);
 	viewArena(gridSize);
+	int gameRes;
+
 	while(1){
 		cout << "Learner's Move :" << endl;
 		nextMove(oState, xState, GREEDY, PLAYER_X);
+		gameRes = GameOver(xState);
 		printMat(gridSize, xState.mat);
+<<<<<<< HEAD
 		if ((GameOver(xState) == WIN)){
 				cout << "Learner Won" << endl; // printMat(gridSize, xState.mat);
 		    return 0;
@@ -393,6 +439,28 @@ int humanPlay(int gridSize){ // only plays not update, output will be win or loo
 		if ((GameOver(oState) == LOSE)){
 				cout << "Learner Won,You Lost" << endl; // printMat(gridSize, xState.mat);
 		    return 0;
+=======
+		if ((gameRes == WIN)){
+				cout << "Learner Won" << endl; // printMat(gridSize, xState.mat);
+		    return;
+		}
+		if ((gameRes == DRAW)){
+				cout << " It's a Draw" << endl; // printMat(gridSize, xState.mat);
+		    return;
+		}
+
+		cout << "Your Move :" << endl;
+		humanInput(xState, oState, gridSize);
+		gameRes = GameOver(oState);
+		printMat(gridSize, oState.mat);
+		if ((gameRes == LOSE)){
+				cout << "Learner Lost, You won" << endl; // printMat(gridSize, xState.mat);
+		    return;
+		}
+		if ((gameRes == DRAW)){
+				cout << " It's a Draw" << endl; // printMat(gridSize, xState.mat);
+		    return;
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 		}
 	}
 }
@@ -488,6 +556,7 @@ int main(int argc, char **argv){
     notLost.push_back(100*( gamesDraw/checkCount + gamesWin/checkCount) );
     lostPercent.push_back(100*gamesLose/checkCount);
 		Trainings.push_back(i);
+<<<<<<< HEAD
 
 		int p=trains/1000;
 		if(i%p==0){
@@ -496,6 +565,14 @@ int main(int argc, char **argv){
 		}
 	}
 
+=======
+
+		cout << i << "th training :=  Win Percent : " << winPercent[i] << " | Draw Percent :" << drawPercent[i] << " | Lost Percent :" << lostPercent[i] << endl;
+		fout << i << "th training :=  Win Percent :" << winPercent[i] << " | Draw Percent :" << drawPercent[i] << " | Lost Percent :" << lostPercent[i] << endl;
+
+	}
+
+>>>>>>> b5edc7629010c8d1978d3a4245cb12d3a572a5f3
 	plotGraph(Trainings, winPercent, drawPercent, notLost, lostPercent, plotfileName);
 	fout.close();
 	cout << "And the stats are stored in file named : " << textfileName << endl;
