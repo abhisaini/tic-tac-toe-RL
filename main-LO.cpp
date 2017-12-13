@@ -198,7 +198,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 			for (int j = 0; j < gridSize; j++) {
 				if (currState.mat[i][j] == 0) {
 					equate(currState, nextState);
-					nextState.mat[i][j] = 1;
+					nextState.mat[i][j] = player;
 					nextState.val = getVal(nextState);
 					if (nextState.val >= largestValue) {
 						largestValue = nextState.val;
@@ -213,7 +213,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 			for (int j = 0; j < gridSize; j++) {
 				if (currState.mat[i][j] == 0) {
 					equate(currState, nextState);
-					nextState.mat[i][j] = 1;
+					nextState.mat[i][j] = player;
 					nextState.val = getVal(nextState);
 					if (nextState.val == largestValue) {
 						array.push_back(3*i + j);
@@ -227,9 +227,11 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		    freespace[i] = array[i];
 		}
 		// equate(dummyState, nextState);
+		//cout << "xx" << endl;
 		int move = randomInput(freespace, count);
     randomChanged(currState, nextState, move, player);
 		nextState.val = getVal(nextState);
+		//cout << "xx1" << endl;
 
 	}
 	else {
@@ -278,12 +280,12 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 	state dummyStateO(gridSize);
 
 	int turns = int (1/epsilon);
-	int j = 0,j1=epsLearn;
+	int j = 0, j1 = epsLearn;
 	int policy;
 	int gameRes;
 
 	while(1){
-
+		// cout << "xmove" << endl;
 		if (epsilon)
 		{
 			j++;
@@ -291,10 +293,15 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 			else {policy = GREEDY;}
 		}
 		else {policy = GREEDY;}
+		// cout << "xx" << endl;
 		nextMove(oState, xState, policy, PLAYER_X);
-		int gameRes = GameOver(xState);
+		// cout << "xxx" << endl;
+		gameRes = GameOver(xState);
+		// cout << "dd" << endl;
 		if (!alreadyExist(xState)) pushBack(xState);
+		// cout << "ddddd" << endl;
 		int i = getStateIndex(dummyState);
+		// cout << "d4" << endl;
 		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], xState, alpha);
 		if ((gameRes == WIN)||(gameRes == DRAW)) {
 		    if (gameRes == WIN) win++;
@@ -302,7 +309,7 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(xState, dummyState);
-
+		// cout << "omove" << endl;
 		// Learner opponent
 		if (epsilon)
 		{
@@ -315,7 +322,7 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		gameRes = GameOver(oState);
 		if (!alreadyExist(oState)) pushBack(oState);
 		i = getStateIndex(dummyStateO);
-		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], oState, alpha);
+		if (i != -1 && policy == GREEDY) backUp(stateArray[i], oState, alpha);
 		if ((gameRes == WIN)||(gameRes == DRAW)) {
 		    if (gameRes == WIN) win++;
 		    else draw++;
@@ -464,7 +471,7 @@ int main(int argc, char **argv){
 	cout << "If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate " << endl;
 	std::cin >> checkCount;
 	cout << "Please enter the data again that u entered now !" << endl;
-	epsLearn=rand()%trains;
+	epsLearn = rand()%trains;
 	std::vector<float> winPercent;
 	std::vector<float> drawPercent;
 	std::vector<float> Trainings;
@@ -481,7 +488,11 @@ int main(int argc, char **argv){
 
 	for (int i = 0; i < trains; i++) {
 
+		// cout << "before playGame" << endl;
+
 		playBothGame(epsilon, alpha, gridSize);
+
+		// cout  << "after playBothGame" << endl;
 
 		float gamesWin = 0;
 		float gamesDraw = 0;
@@ -495,6 +506,8 @@ int main(int argc, char **argv){
 			else if (gameResult == DRAW) gamesDraw++;
 
 		}
+
+		// cout << "after gameResult" << endl;
 
 		winPercent.push_back(100*gamesWin/checkCount);
 		drawPercent.push_back(100*gamesDraw/checkCount);
