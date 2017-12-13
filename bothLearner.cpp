@@ -405,68 +405,7 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 }
 
 // To Play against human
-void viewArena(int gridSize){
-	cout << "Here is ur field :)" << endl;
-    for (int i = 0; i < gridSize; i++){
-        for (int j = 0; j < gridSize; j++){
-					cout << i*gridSize+j+1;
-					if(j < gridSize - 1) {
-				 		cout<< " |";
-					}
-        }
-        if(i < gridSize - 1) cout << endl << "--------------------" << endl;
-    }
-    cout << endl<<"___________________" << endl;
-}
 
-void humanInput(state &S1, state &S2,int gridSize){
-	int move;
-	cout << "choose ur move between 1 to " + to_string(gridSize) << endl;
-	cout << "Please dont choose the space occupied by X" << endl;
-	cin >> move;
-	move--;
-	int sz = S1.mat.size();
-	int moveX = move/sz, moveY = move%sz;
-  equate(S1, S2);
-	S2.mat[moveX][moveY]= -1;
-  return;
-}
-
-void humanPlay(int gridSize){ // only plays not update, output will be win or loose
-
-	state oState(gridSize);
-	state xState(gridSize);
-	viewArena(gridSize);
-	int gameRes;
-
-	while(1){
-		cout << "Learner's Move :" << endl;
-		nextMove(oState, xState, GREEDY, PLAYER_X);
-		gameRes = GameOver(xState);
-		printMat(gridSize, xState.mat);
-		if ((gameRes == WIN)){
-				cout << "Learner Won" << endl; // printMat(gridSize, xState.mat);
-		    return;
-		}
-		if ((gameRes == DRAW)){
-				cout << " It's a Draw" << endl; // printMat(gridSize, xState.mat);
-		    return;
-		}
-
-		cout << "Your Move :" << endl;
-		humanInput(xState, oState, gridSize);
-		gameRes = GameOver(oState);
-		printMat(gridSize, oState.mat);
-		if ((gameRes == LOSE)){
-				cout << "Learner Lost, You won" << endl; // printMat(gridSize, xState.mat);
-		    return;
-		}
-		if ((gameRes == DRAW)){
-				cout << " It's a Draw" << endl; // printMat(gridSize, xState.mat);
-		    return;
-		}
-	}
-}
 
 // Below snippet plotts the graphs
 // the below function gives destination for plotting image
@@ -613,17 +552,8 @@ int main(int argc, char **argv){
 
 	plotGraph(Trainings, winPercent, lostPercent, winOppLearn, lostOppLearn, plotfileName);
 	fout.close();
-	cout << "And the stats are stored in file named : " << textfileName << endl;
-	cout << "Wanna play with learner ??" << endl;
-	int humanGameCount = 1;
-	while(humanGameCount){
-		cout << "Hey do u want to play with me :)" << endl;
-		string humansChoice;
-		cout << "Please reply with yes/no" << endl;
-		cin >> humansChoice;
-		if(humansChoice == "yes") humanPlay(gridSize);
-		else humanGameCount--;
-	}
+	
+	
 
  return 0;
 
