@@ -196,11 +196,11 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 	if (policy == GREEDY){
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
-				if (currState.mat[i][j] == 0){
+				if (currState.mat[i][j] == 0) {
 					equate(currState, nextState);
 					nextState.mat[i][j] = 1;
 					nextState.val = getVal(nextState);
-					if (nextState.val >= largestValue){
+					if (nextState.val >= largestValue) {
 						largestValue = nextState.val;
 						// equate(nextState, dummyState);
 					}
@@ -211,11 +211,11 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		int count = 0;
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
-				if (currState.mat[i][j] == 0){
+				if (currState.mat[i][j] == 0) {
 					equate(currState, nextState);
 					nextState.mat[i][j] = 1;
 					nextState.val = getVal(nextState);
-					if (nextState.val == largestValue){
+					if (nextState.val == largestValue) {
 						array.push_back(3*i + j);
 						count++;
 					}
@@ -223,12 +223,12 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 			}
 		}
 		int freespace[count];
-		for (int i = 0; i < count; i++){
+		for (int i = 0; i < count; i++) {
 		    freespace[i] = array[i];
 		}
 		// equate(dummyState, nextState);
 		int move = randomInput(freespace, count);
-        randomChanged(currState, nextState, move, PLAYER_X);
+    randomChanged(currState, nextState, move, player);
 		nextState.val = getVal(nextState);
 
 	}
@@ -276,9 +276,11 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 	state xState(gridSize);
 	state dummyState(gridSize);
 	state dummyStateO(gridSize);
+
 	int turns = int (1/epsilon);
 	int j = 0,j1=epsLearn;
 	int policy;
+	int gameRes;
 
 	while(1){
 
@@ -300,7 +302,7 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(xState, dummyState);
-		
+
 		// Learner opponent
 		if (epsilon)
 		{
@@ -310,9 +312,9 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		}
 		else {policy = GREEDY;}
 		nextMove(xState, oState, policy, PLAYER_O);
-		 gameRes = GameOver(oState);
+		gameRes = GameOver(oState);
 		if (!alreadyExist(oState)) pushBack(oState);
-		 i = getStateIndex(dummyStateO);
+		i = getStateIndex(dummyStateO);
 		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], oState, alpha);
 		if ((gameRes == WIN)||(gameRes == DRAW)) {
 		    if (gameRes == WIN) win++;
@@ -320,20 +322,20 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(oState, dummyStateO);
-		
 	}
 }
-
 
 int game(int gridSize){ // only plays not update, output will be win or loose
 
 	state oState(gridSize);
 	state xState(gridSize);
+
 	int gameRes;
+
 	while(1){
 
 		nextMove(oState, xState, GREEDY, PLAYER_X);
-		int gameRes = GameOver(xState);
+		gameRes = GameOver(xState);
 		if ((gameRes == WIN)||(gameRes == DRAW)) return gameRes;
 
 		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
@@ -448,7 +450,7 @@ int main(int argc, char **argv){
 	float epsilon, alpha;
 	int gridSize, trains;
 	float checkCount;
-	
+
 	cout << "What epsilon u want,choose any number between 0 to 1 : " << endl
 	<<"But for better training prefer lesser value of epsilon"<<endl;
 	std::cin >> epsilon;
