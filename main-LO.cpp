@@ -122,7 +122,7 @@ int spaceRandom(state const &s) {
 int randomInput(int arr[], int length){
 
 	// srand(time(NULL)); // can use this to decrease the training time
-  int input=rand()%length;
+	int input=rand()%length;
   return arr[input];
 }
 
@@ -194,6 +194,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 	int gridSize = currState.mat.size();
 	// state dummyState(gridSize);
 	if (policy == GREEDY){
+
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
 				if (currState.mat[i][j] == 0) {
@@ -209,9 +210,12 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		}
 		std::vector<int> array;
 		int count = 0;
+		int count0 = 0;
+
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
 				if (currState.mat[i][j] == 0) {
+					count0++;
 					equate(currState, nextState);
 					nextState.mat[i][j] = player;
 					nextState.val = getVal(nextState);
@@ -222,16 +226,16 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 				}
 			}
 		}
+
 		int freespace[count];
 		for (int i = 0; i < count; i++) {
 		    freespace[i] = array[i];
 		}
 		// equate(dummyState, nextState);
-		//cout << "xx" << endl;
-		int move = randomInput(freespace, count);
+				int move = randomInput(freespace, count);
+
     randomChanged(currState, nextState, move, player);
 		nextState.val = getVal(nextState);
-		//cout << "xx1" << endl;
 
 	}
 	else {
@@ -285,7 +289,6 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 	int gameRes;
 
 	while(1){
-		// cout << "xmove" << endl;
 		if (epsilon)
 		{
 			j++;
@@ -293,15 +296,10 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 			else {policy = GREEDY;}
 		}
 		else {policy = GREEDY;}
-		// cout << "xx" << endl;
 		nextMove(oState, xState, policy, PLAYER_X);
-		// cout << "xxx" << endl;
 		gameRes = GameOver(xState);
-		// cout << "dd" << endl;
 		if (!alreadyExist(xState)) pushBack(xState);
-		// cout << "ddddd" << endl;
 		int i = getStateIndex(dummyState);
-		// cout << "d4" << endl;
 		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], xState, alpha);
 		if ((gameRes == WIN)||(gameRes == DRAW)) {
 		    if (gameRes == WIN) win++;
@@ -309,7 +307,6 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(xState, dummyState);
-		// cout << "omove" << endl;
 		// Learner opponent
 		if (epsilon)
 		{
@@ -323,8 +320,8 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		if (!alreadyExist(oState)) pushBack(oState);
 		i = getStateIndex(dummyStateO);
 		if (i != -1 && policy == GREEDY) backUp(stateArray[i], oState, alpha);
-		if ((gameRes == WIN)||(gameRes == DRAW)) {
-		    if (gameRes == WIN) win++;
+		if ((gameRes == LOSE)||(gameRes == DRAW)) {
+		    if (gameRes == LOSE) loss++;
 		    else draw++;
 		    break;
 		}
@@ -369,7 +366,7 @@ void viewArena(int gridSize){
 
 void humanInput(state &S1, state &S2,int gridSize){
 	int move;
-	cout << "choose ur move between 1 to " + to_string(gridSize) << endl;
+	cout << "choose ur move between 1 to " << gridSize*gridSize << endl;
 	cout << "Please dont choose the space occupied by X" << endl;
 	cin >> move;
 	move--;
