@@ -230,7 +230,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		}
 		// equate(dummyState, nextState);
 		int move = randomInput(freespace, count);
-        randomChanged(currState, nextState, move, PLAYER_X);
+        randomChanged(currState, nextState, move, player);
 		nextState.val = getVal(nextState);
 
 	}
@@ -347,7 +347,7 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(xState, dummyState);
-		
+
 		// Learner opponent
 		if (epsilon)
 		{
@@ -367,24 +367,12 @@ void playBothGame(float epsilon, float alpha, int gridSize){ // plays a game, ob
 		    break;
 		}
 		equate(oState, dummyStateO);
-		
+
 	}
 }
 
 
-
-
 /*****************************************************************************************************/
-
-
-
-
-
-
-
-
-
-
 
 int game(int gridSize){ // only plays not update, output will be win or loose
 
@@ -423,7 +411,7 @@ string plotFile(){
 	std::cout << "Enter value of checkCount again :-)" << '\n';
 	std::cin >> checkCount;
 
-	string plotfile = "Results/Grid-" + gridSize+ "/oppLearn_Alpha-"+alpha+"_Epsilon-" +epsilon + "_Trainings-" + trains + "CheckCount" +checkCount;
+	string plotfile = "Results/Grid-" + gridSize+ "/ROvsLO_Alpha-"+alpha+"_Epsilon-" +epsilon + "_Trainings-" + trains + "CheckCount" +checkCount;
 	return plotfile;
 }
 
@@ -461,7 +449,7 @@ int main(int argc, char **argv){
 	cout << "If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate " << endl;
 	std::cin >> checkCount;
 	cout << "Please enter the data again that u entered now !" << endl;
-	
+
 	epsLearn= rand() % trains ;
 
 	std::vector<float> winPercent;
@@ -541,19 +529,10 @@ int main(int argc, char **argv){
 
 /*****************************************************************/
 
-
-
-
-
-
-
-
-
-
 	plotGraph(Trainings, winPercent, lostPercent, winOppLearn, lostOppLearn, plotfileName);
 	fout.close();
-	
-	
+
+
 
  return 0;
 

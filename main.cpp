@@ -289,21 +289,24 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 			else {policy = GREEDY;}
 		}
 		else {policy = GREEDY;}
+
 		nextMove(oState, xState, policy, PLAYER_X);
 		int gameRes = GameOver(xState);
 		if (!alreadyExist(xState)) pushBack(xState);
 		int i = getStateIndex(dummyState);
 		if (i != -1 && policy == GREEDY ) backUp(stateArray[i], xState, alpha);
 		if ((gameRes == WIN)||(gameRes == DRAW)) {
-		    if (GameOver(xState) == WIN) win++;
+		    if (gameRes == WIN) win++;
 		    else draw++;
 		    break;
 		}
+
 		equate(xState, dummyState);
+
 		nextMove(xState, oState, EXPLORATORY, PLAYER_O);
 		gameRes = GameOver(oState);
 		if ((gameRes == LOSE)||(gameRes == DRAW)) {
-				if (GameOver(oState)== LOSE) loss++;
+				if (gameRes == LOSE) loss++;
 				else draw++;
 		    break;
 		}

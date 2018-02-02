@@ -1,0 +1,13 @@
+No of Trainings | Percentage0th training :=  Win Percent :10 | Draw Percent :0 | Lost Percent :90
+1th training :=  Win Percent :10 | Draw Percent :0 | Lost Percent :90
+2th training :=  Win Percent :20 | Draw Percent :0 | Lost Percent :80
+3th training :=  Win Percent :10 | Draw Percent :0 | Lost Percent :90
+4th training :=  Win Percent :0 | Draw Percent :0 | Lost Percent :100
+5th training :=  Win Percent :40 | Draw Percent :0 | Lost Percent :60
+6th training :=  Win Percent :0 | Draw Percent :0 | Lost Percent :100
+7th training :=  Win Percent :10 | Draw Percent :0 | Lost Percent :90
+8th training :=  Win Percent :0 | Draw Percent :0 | Lost Percent :100
+9th training :=  Win Percent :20 | Draw Percent :0 | Lost Percent :80
+10th training :=  Win Percent :10 | Draw Percent :0 | Lost Percent :90
+11th training :=  Win Percent :0 | Draw Percent :0 | Lost Percent :100
+12th training :=  Win Percent :0 | Draw Percent :0 | Lost Percent :100
