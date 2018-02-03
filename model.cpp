@@ -7,6 +7,7 @@
 #define OPP_CORNER 6
 #define EMPTY_CORNER 7
 #define EMPTY_SIDE 8
+#define OTHERS 9
 #define GREEDY 0
 #define EXPLORATORY 1
 #define PLAYER_X 1
@@ -14,6 +15,8 @@
 #define EMPTY 0
 #define LOSE 0
 #define DRAW 4
+
+typedef std::vector<std::vector<int> > Matrix;
 
 class state { // inorder to describe  a state with the positions of X and O and its value function
 public:
@@ -30,111 +33,162 @@ public:
 	~state(void){}
 };
 
-int rowSum(state const& S, int rowIndex) {
+std::vector<state> stateArray;
+
+class posStateArray{
+public:
+	int positions;
+	stateArray A;
+	posStateArray(int value) {
+		turnCounts = value;
+	}
+	~posStateArray(void){}
+};
+
+int rowSum(state const& S, int rowIndex, int player) {
   int sum = 0;
   for (int i = 0; i < 3; i++) {
-    sum = sum + S.mat[rowIndex][i]
+		if (S.mat[i][j] == player) sum = sum + S.mat[rowIndex][i];
   }
   return sum;
 }
 
-int colSum(state const& S, int colIndex) {
+int colSum(state const& S, int colIndex, int player) {
   int sum = 0;
   for (int i = 0; i < 3; i++) {
-    sum = sum + S.mat[i][colIndex]
+    if (S.mat[i][j] == player) sum = sum + S.mat[i][colIndex];
   }
   return sum;
 }
 
-int diaSum(state const& S, int direction) {
-  if (direction == 1) return S.mat[0][0] + S.mat[1][1] + S.mat[2][2];
-  else return S.mat[0][2] + S.mat[1][1] + S.mat[2][0];
+int diaSum(state const& S, int direction, int player) {
+
+	int sum = 0;
+	for (int i = 0; i < 3; i++) {
+		if (direction == 1) {
+			if (S.mat[i][i] == player) sum = sum + S.mat[i][i];
+		}
+		else {
+			if (S.mat[i][2-j] == player) sum = sum + S.mat[i][2-i];
+		}
+	}
+	return sum;
+}
+
+int countTurns(state const& S, int player) {
+
+	int count = 0;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (S.mat[i][j] == player) count++;
+		}
+	}
+	return count;
 }
 
 int winClassifier(state const& S, int player) {
 
   for (int i = 0; i < 3; i++) {
-    if ((rowSum(S, i) == 2*player)||(colSum(S, i) == 2*player) {
+    if ((rowSum(S, i, player) == 2*player)||(colSum(S, i, player) == 2*player) {
       return 1;
     }
   }
 
-  if ((diaSum(S, 1)==2*player)||(diaSum(S, -1)==2*player)) return 1;
+  if ((diaSum(S, 1, player)==2*player)||(diaSum(S, -1, player)==2*player)) return 1;
 
   return 0;
 
 }
 
-int blockClassifier(state const& S, int player) {
-
-  for (int i = 0; i < 3; i++) {
-    if ((rowSum(S, i) == -2*player)||(colSum(S, i) == -2*player) {
-      return 1;
-    }
-  }
-
-  if ((diaSum(S, 1) == -2*player)||(diaSum(S, -1) == -2*player)) return 1;
-
-  return 0;
-
-}
+// int blockClassifier(state const& S, int player) {
+//
+//   for (int i = 0; i < 3; i++) {
+//     if ((rowSum(S, i) == -2*player)||(colSum(S, i) == -2*player) {
+//       return 1;
+//     }
+//   }
+//
+//   if ((diaSum(S, 1) == -2*player)||(diaSum(S, -1) == -2*player)) return 1;
+//
+//   return 0;
+//
+// }
 
 int forkedClassifier(state const& S, int player) {
 
   winCount = 0;
   for (int i = 0; i < 3; i++) {
-    if (rowSum(S, i) == 2*player) winCount++;
-    if (colSum(S, i) == 2*player) winCount++;
+    if (rowSum(S, i, player) == 2*player) winCount++;
+    if (colSum(S, i, player) == 2*player) winCount++;
   }
-  if (diaSum(S, 1) == 2*player) winCount++;
-  if (diaSum(S, -1) == 2*player) winCount++;
+  if (diaSum(S, 1, player) == 2*player) winCount++;
+  if (diaSum(S, -1, player) == 2*player) winCount++;
 
   if (winCount > 1) return 1;
   else return 0;
 
 }
 
-int centerClassifier(state const& S, int player) {
-  int sum = 0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-        sum = sum + S.mat[i][j];
-    }
-  }
+int forkClassifier(state const& S, int player) {
 
-  if ((sum == player)&&(S.mat[1][1] == player)) return 1;
-  else return 0;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (S.mat[i][j] == 0) {
+				state S1;
+				equate(S, S1);
+				S1.mat[i][j] = player;
+				if (forkedClassifier(S1, player)) return 1;
+			}
+		}
+	}
+
+	return 0;
+
 }
 
-int cornerClassifier(state const& S, int player) {
-  int sum = 0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-        sum = sum + S.mat[i][j];
-    }
-  }
-  if (((S.mat[0][0] == player)||(S.mat[0][2] == player)||(S.mat[2][0] == player)||(S.mat[2][2] == player))&&(sum == player)) return 1;
-  else return 0;
+// int centerClassifier(state const& S, int player) {
+//   int sum = 0;
+//   for (int i = 0; i < 3; i++) {
+//     for (int j = 0; j < 3; j++) {
+//         sum = sum + S.mat[i][j];
+//     }
+//   }
+//
+//   if ((sum == player)&&(S.mat[1][1] == player)) return 1;
+//   else return 0;
+// }
 
+int emptyCornerClassifier(state const& S, int player) {
+
+	if ((S.mat[0][0] == 0 && S.mat[2][2] == 0)||(S.mat[2][0] == 0 && S.mat[0][2] == 0)) return 1;
+	else return 0;
+}
+
+int oppCornerClassifier(state const& S, int player) {
+
+	if ((S.mat[0][0] == -1*player)&&(S.mat[2][2] == 0)) return 1;
+	else if ((S.mat[0][0] == 0)&&(S.mat[2][2] == -1*player)) return 1;
+	else if ((S.mat[2][0] == -1*player)&&(S.mat[0][2] == 0)) return 1;
+	else if ((S.mat[0][2] == -1*player)&&(S.mat[2][0] == 0)) return 1;
+	else return 0;
 }
 
 int emptyClassifier(state const& S, int player) {
-  int sum = 0;
+  int sum1 = 0;
+	int sum2 = 0;
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-        sum = sum + S.mat[i][j];
+        if (S.mat[i][j] == player) sum1 = sum1 + S.mat[i][j];
+				else sum2 = sum2 + S.mat[i][j];
     }
   }
-  if (sum == 0) return 1;
+  if (sum1 == 0 && sum2 ==0) return 1;
   else return 0;
 }
 
 int emptySideClassifier(state const&, int player) {
 
-  for (int i = 0; int < 3; i++){
-    if (rowSum(S, i) == 0||colSum(S, i) == 0) return 1;
-  }
-
+	if ((rowSum(S, 2, player) == 0&&rowSum(S, 2, -1*player) == 0)||(colSum(S, 2, player) == 0&&colSum(S, 2, -1*player) == 0)||(rowSum(S, 0, player) == 0&&rowSum(S, 0, -1*player) == 0)||(colSum(S, 0, player) == 0&&colSum(S, 0, -1*player) == 0)) return 1;
   return 0;
 }
 
@@ -142,8 +196,14 @@ int emptySideClassifier(state const&, int player) {
 int modelClassifier(state const& S, int player) {
 
   if (winClassifier(S, player)) return WIN;
-  else if (blockClassifier(S, player)) return BLOCK;
-
+  else if (winClassifier(S, -1*player)) return BLOCK;
+	else if (forkClassifier(S, player)) return FORK;
+	else if (forkClassifier(S, -1*player)) return OPP_FORK_BLOCK;
+	else if (emptyClassifier(S, player)) return CENTER;
+	else if (emptyCornerClassifier(S, player)) return EMPTY_CORNER;
+	else if (oppCornerClassifier(S, player)) return OPP_CORNER;
+	else if (emptySideClassifier(S, player)) return EMPTY_SIDE;
+	else return OTHERS;
 }
 
 int main(int argc, char** argv) {
