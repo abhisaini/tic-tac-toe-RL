@@ -23,6 +23,8 @@ public:
 	int gridSize;
 	Matrix mat;
 	float val;
+	int config;
+	int turnCount;
 	state(int value){
 		gridSize = value;
 		mat.resize(gridSize);
@@ -35,15 +37,28 @@ public:
 
 std::vector<state> stateArray;
 
-class posStateArray{
+class model{
 public:
-	int positions;
-	stateArray A;
-	posStateArray(int value) {
-		turnCounts = value;
+	int config;
+	int turnCount;
+	stateArray array;
+	model(int value) {
+		config = value;
 	}
-	~posStateArray(void){}
+	~model(void){}
 };
+
+// posStateArray win(1);
+// posStateArray block(2);
+// posStateArray fork(3);
+// posStateArray oppForkBlock(4);
+// posStateArray center(5);
+// posStateArray oppCorner(6);
+// posStateArray emptyCorner(7);
+// posStateArray emptySide(8);
+// posStateArray others(9);
+
+std::vector<model> models;
 
 int rowSum(state const& S, int rowIndex, int player) {
   int sum = 0;
@@ -75,16 +90,72 @@ int diaSum(state const& S, int direction, int player) {
 	return sum;
 }
 
-int countTurns(state const& S, int player) {
+int whoseTurn(state const& S) {
 
-	int count = 0;
+	int sum1 = 0;
+	int sum2 = 0;
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			if (S.mat[i][j] == player) count++;
+			if (S.mat[i][j] == 1) sum1++;
+			else if (S.mat[i][j] == -1) sum2++;
 		}
 	}
-	return count;
+	if (sum1 == sum2) return 1;
+	else return -1;
 }
+
+int countTurns(state const& S) {
+
+	int sum1 = 0;
+	int sum2 = 0;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (S.mat[i][j] == 1) sum1++;
+			else if (S.mat[i][j] == -1) sum2++;
+		}
+	}
+	if (sum1 == sum2) return sum1;
+	else return -1;
+}
+
+void pushInOrder(state const& S, model A) {
+	state S1;
+	equate(S, S1);
+	for(int i = A.array.size()-1; i >= 0; i--) {
+			if (A.array[i].val <= S1.val) A.array.insert(A.array.begin() + i, S1); break;
+	}
+	return;
+}
+
+void classifyPush(state const& S) {
+
+	int modelNo = modelClassifier(S, PLAYER_X);
+	int turns = countTurns(S); // only for PLAYER_X
+	for (int i = 0; i < models.size(); i++) {
+		if (models[i].config == modelNo && models[i].turnCount == turns) {
+			pushInOrder(S, models[i]);
+		}
+		else {
+			model A(modelNo);
+			A.turnCount = turns;
+			models.push_back(A);
+			A.array.push_back(S);
+		}
+	}
+	return;
+	
+}
+
+// int countTurns(state const& S, int player) {
+//
+// 	int count = 0;
+// 	for (int i = 0; i < 3; i++) {
+// 		for (int j = 0; j < 3; j++) {
+// 			if (S.mat[i][j] == player) count++;
+// 		}
+// 	}
+// 	return count;
+// }
 
 int winClassifier(state const& S, int player) {
 
