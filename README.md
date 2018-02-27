@@ -16,15 +16,10 @@ Installation
 
             git clone https://github.com/abhisaini/tic-tac-toe-rl
             
- -Create Directories to store your outputs by running following commands
+- Create Directories to store your outputs by running following command
  
-            mkdir Text-Results Plot-Results Plot-CompEp-Results Text-CompEp-Results
-      
- * Now in each of the above directories create sub-directories to store results sorted by gridsize of tic-tac-toe.
-       So in each Directory 
-    
-            mkdir Grid-3 Grid-4 Grid-5 Grid-6 Grid-7
-            
+            bash prepare.sh
+                  
             
 
 
@@ -32,5 +27,16 @@ Installation
  ----
  - If u have python 2.7 installed and have C++11,Run following command (in tic-tac-toe-rl directory) :
             
-            g++ minimal.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
+            g++ filename.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
+
+- For python 3.6 
+
+            g++ filename.cpp -I/usr/include/python3.6 -lpython3.6
             
+- For python 4
+
+            g++ example.cpp -I/usr/local/include/fancy-python4 -L/usr/local/lib -lfancy-python4            
+            
+About Files
+----
+- Here main.cpp contains a simple tic-tac-toe learner 
