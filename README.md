@@ -16,7 +16,7 @@ Installation
 
             git clone https://github.com/abhisaini/tic-tac-toe-rl
             
- -Create Directories to store your outputs by running following command
+- Create Directories to store your outputs by running following command
  
             bash prepare.sh
                   
