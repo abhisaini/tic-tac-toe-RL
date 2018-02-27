@@ -40,3 +40,5 @@ Installation
 About Files
 ----
 - Here main.cpp contains a simple tic-tac-toe learner 
+- **unordered_map/try_map.cpp** is the new updated file which stores states in a optimal way and consumes a lesser amount of time as compared to main.cpp 
+- It it recommended to use that inorder to train .
