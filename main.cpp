@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
-#include "matplotlibcpp.h" // library for plotting
+#include <string>
+//#include "matplotlibcpp.h" // library for plotting
 #define GREEDY 0
 #define EXPLORATORY 1
 #define PLAYER_X 1
@@ -10,7 +11,7 @@
 #define DRAW 4
 
 using namespace std;
-namespace plt = matplotlibcpp; // namespace for plotting
+//namespace plt = matplotlibcpp; // namespace for plotting
 typedef std::vector<int> Vector;
 typedef std::vector<std::vector<int> > Matrix;
 
@@ -172,7 +173,7 @@ string OX(int a){
 	if (a == 0) return empty;
 	if (a == 1) return xOccupied;
 	if (a == -1) return oOccupied;
-	else return to_string(a);
+	//else return std :: to_string(a);
 }
 
 void printMat(int gridSize, Matrix mat){
@@ -216,7 +217,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 					nextState.mat[i][j] = 1;
 					nextState.val = getVal(nextState);
 					if (nextState.val == largestValue){
-						array.push_back(3*i + j);
+						array.push_back(gridSize*i + j);
 						count++;
 					}
 				}
@@ -348,7 +349,7 @@ void viewArena(int gridSize){
 
 void humanInput(state &S1, state &S2,int gridSize){
 	int move;
-	cout << "choose ur move between 1 to " + to_string(gridSize) << endl;
+	cout << "choose ur move between 1 to " /*+ std :: to_string(gridSize) */<< endl;
 	cout << "Please dont choose the space occupied by X" << endl;
 	cin >> move;
 	move--;
@@ -397,7 +398,7 @@ void humanPlay(int gridSize){ // only plays not update, output will be win or lo
 
 // Below snippet plotts the graphs
 // the below function gives destination for plotting image
-
+/*
 string plotFile(){
 	string epsilon, alpha,gridSize,trains,checkCount;
 	cout << "What was the epsilon ?" << endl;
@@ -430,7 +431,7 @@ void plotGraph(std::vector<float> Trainings, std::vector<float> winPercent, std:
 	cout << "The Graph is stored in file named : " << plotfileName << endl;
 
 }
-
+*/
 int main(int argc, char **argv){
 
 	float epsilon, alpha;
@@ -456,10 +457,10 @@ int main(int argc, char **argv){
 	std::vector<float> notLost;
 	std::vector<float> lostPercent;
 
-	string fileName = plotFile();
+	//string fileName = plotFile();
 
-	string plotfileName = "Plot-" + fileName + ".png";
-	string textfileName = "Text-" + fileName + ".txt";
+	//string plotfileName = "Plot-" + fileName + ".png";
+	string textfileName = "Text-Results.txt";
 	ofstream fout(textfileName.c_str());
 
 	fout << "No of Trainings | Percentage";
@@ -492,7 +493,7 @@ int main(int argc, char **argv){
 
 	}
 
-	plotGraph(Trainings, winPercent, drawPercent, notLost, lostPercent, plotfileName);
+	//plotGraph(Trainings, winPercent, drawPercent, notLost, lostPercent, plotfileName);
 	fout.close();
 	cout << "And the stats are stored in file named : " << textfileName << endl;
 	cout << "Wanna play with learner ??" << endl;

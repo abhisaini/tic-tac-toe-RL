@@ -1,6 +1,7 @@
 // Command to compile
-//g++ -std=c++0x main.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
-
+/*
+g++ -std=c++0x try_map.cpp -std=c++11 -I/usr/include/python2.7 -lpython2.7
+*/
 
 
 
@@ -57,6 +58,7 @@ string matToString(Matrix mat){
 
 			}
 		}
+		return str;
 }
 unordered_map<string, double> stateMap;
  // array to store all the states possible
@@ -109,6 +111,7 @@ float getValUnknown(Matrix arr)
 // gives the value function of the function
 
 float getVal(state s){
+		//cout << "\t \t in getVal";
 		string key = matToString(s.mat);
 		if(stateMap.find(key) == stateMap.end()){
 				return getValUnknown(s.mat);
@@ -116,6 +119,7 @@ float getVal(state s){
 		else{
 				return stateMap[key];
 		}
+		return 0;
 }
 void equate(state &state1, state &state2) {
 	for (int i = 0; i < state1.mat.size(); i++) {
@@ -211,17 +215,20 @@ void printMat(int gridSize, Matrix mat){
 }
 
 void nextMove (state &currState, state &nextState, int policy, int player){
-
+	//cout << "\t in nextMove \n";
 	float largestValue = 0;
 	int gridSize = currState.mat.size();
 	// state dummyState(gridSize);
+	//cout << "no error in currState \n";
 	if (policy == GREEDY){
 		for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
 				if (currState.mat[i][j] == 0){
 					equate(currState, nextState);
 					nextState.mat[i][j] = 1;
+					//cout << "before getVal \n" ;
 					nextState.val = getVal(nextState);
+					//cout << "after getVal \n" ;
 					if (nextState.val >= largestValue){
 						largestValue = nextState.val;
 						// equate(nextState, dummyState);
@@ -229,6 +236,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 				}
 			}
 		}
+		//cout << " greedy done";
 		std::vector<int> array;
 		int count = 0;
 		for (int i = 0; i < gridSize; i++) {
@@ -238,7 +246,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 					nextState.mat[i][j] = 1;
 					nextState.val = getVal(nextState);
 					if (nextState.val == largestValue){
-						array.push_back(3*i + j);
+						array.push_back(gridSize*i + j);
 						count++;
 					}
 				}
@@ -246,11 +254,11 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		}
 		int freespace[count];
 		for (int i = 0; i < count; i++){
-		    freespace[i] = array[i];
 		}
 		// equate(dummyState, nextState);
 		int move = randomInput(freespace, count);
         randomChanged(currState, nextState, move, PLAYER_X);
+		//cout << "\t before getVal" ;
 		nextState.val = getVal(nextState);
 
 	}
@@ -310,7 +318,7 @@ void playGame(float epsilon, float alpha, int gridSize){ // plays a game, object
 			else {policy = GREEDY;}
 		}
 		else {policy = GREEDY;}
-
+		//cout << "before nextMove \n" ;
 		nextMove(oState, xState, policy, PLAYER_X);
 		int gameRes = GameOver(xState);
 		if (!alreadyExist(xState)) pushBack(xState);
@@ -364,7 +372,7 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 
 // To Play against human
 void viewArena(int gridSize){
-	cout << "Here is ur field :)" << endl;
+	cout << "Here is ur arena :)" << endl;
     for (int i = 0; i < gridSize; i++){
         for (int j = 0; j < gridSize; j++){
 					cout << i*gridSize+j+1;
@@ -480,7 +488,7 @@ int main(int argc, char **argv){
 	cout << "If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate " << endl;
 	std::cin >> checkCount;
 	cout << "Please enter the data again that u entered now !" << endl;
-
+	//cout << "cc is : " << checkCount << endl ;
 	std::vector<float> winPercent;
 	std::vector<float> drawPercent;
 	std::vector<float> Trainings;
@@ -488,7 +496,7 @@ int main(int argc, char **argv){
 	std::vector<float> lostPercent;
 
 	string fileName = plotFile();
-
+	//cout << "file name is : " << fileName << endl ;
 	string plotfileName = "Plot-" + fileName + ".png";
 	string textfileName = "Text-" + fileName + ".txt";
 	ofstream fout(textfileName.c_str());

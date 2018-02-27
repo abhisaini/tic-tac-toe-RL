@@ -143,7 +143,7 @@ void classifyPush(state const& S) {
 		}
 	}
 	return;
-	
+
 }
 
 // int countTurns(state const& S, int player) {

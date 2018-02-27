@@ -1,0 +1,72 @@
+What epsilon u want,choose any number between 0 to 1 : 
+But for better training prefer lesser value of epsilon
+What alpha u want,choose any number between 0 to 1
+choose gridsize of tic-tac-toe
+How many times do you want to train the Agent
+For how many games u want to calculate probablity after each Training i.e checkCount :
+If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate 
+Please enter the data again that u entered now !
+cc is : 10
+What was the epsilon ?
+Enter the Alpha again :-)
+What was the size of tic-tac-toe?
+How many times you trained the Agent?
+Enter value of checkCount again :-)
+What epsilon u want,choose any number between 0 to 1 : 
+But for better training prefer lesser value of epsilon
+What alpha u want,choose any number between 0 to 1
+choose gridsize of tic-tac-toe
+How many times do you want to train the Agent
+For how many games u want to calculate probablity after each Training i.e checkCount :
+If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate 
+Please enter the data again that u entered now !
+cc is : 10
+What was the epsilon ?
+Enter the Alpha again :-)
+What was the size of tic-tac-toe?
+How many times you trained the Agent?
+Enter value of checkCount again :-)
+What epsilon u want,choose any number between 0 to 1 : 
+But for better training prefer lesser value of epsilon
+What alpha u want,choose any number between 0 to 1
+choose gridsize of tic-tac-toe
+How many times do you want to train the Agent
+For how many games u want to calculate probablity after each Training i.e checkCount :
+If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate 
+Please enter the data again that u entered now !
+cc is : 10
+What was the epsilon ?
+Enter the Alpha again :-)
+What was the size of tic-tac-toe?
+How many times you trained the Agent?
+Enter value of checkCount again :-)
+What epsilon u want,choose any number between 0 to 1 : 
+But for better training prefer lesser value of epsilon
+What alpha u want,choose any number between 0 to 1
+choose gridsize of tic-tac-toe
+How many times do you want to train the Agent
+For how many games u want to calculate probablity after each Training i.e checkCount :
+If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate 
+Please enter the data again that u entered now !
+cc is : 10
+What was the epsilon ?
+Enter the Alpha again :-)
+What was the size of tic-tac-toe?
+How many times you trained the Agent?
+Enter value of checkCount again :-)
+file name is : Results/Grid-3/ Alpha-0.1_Epsilon-0.1_Trainings-10CheckCount10
+What epsilon u want,choose any number between 0 to 1 : 
+But for better training prefer lesser value of epsilon
+What alpha u want,choose any number between 0 to 1
+choose gridsize of tic-tac-toe
+How many times do you want to train the Agent
+For how many games u want to calculate probablity after each Training i.e checkCount :
+If u thoose both no of trains and checkCount a high no,it may take a lot of time to calculate 
+Please enter the data again that u entered now !
+cc is : 10
+What was the epsilon ?
+Enter the Alpha again :-)
+What was the size of tic-tac-toe?
+How many times you trained the Agent?
+Enter value of checkCount again :-)
+file name is : Results/Grid-3/ Alpha-0.1_Epsilon-0.1_Trainings-10CheckCount10

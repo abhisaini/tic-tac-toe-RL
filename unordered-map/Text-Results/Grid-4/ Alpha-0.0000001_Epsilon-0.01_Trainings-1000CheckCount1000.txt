@@ -1,0 +1,17 @@
+No of Trainings | Percentage0th training :=  Win Percent :21.9 | Draw Percent :13.3 | Lost Percent :64.8
+1th training :=  Win Percent :19.4 | Draw Percent :15.4 | Lost Percent :65.2
+2th training :=  Win Percent :20.4 | Draw Percent :13.2 | Lost Percent :66.4
+3th training :=  Win Percent :21.6 | Draw Percent :15.2 | Lost Percent :63.2
+4th training :=  Win Percent :23.7 | Draw Percent :14.8 | Lost Percent :61.5
+5th training :=  Win Percent :22.7 | Draw Percent :14.3 | Lost Percent :63
+6th training :=  Win Percent :22.4 | Draw Percent :14.2 | Lost Percent :63.4
+7th training :=  Win Percent :21.5 | Draw Percent :12.6 | Lost Percent :65.9
+8th training :=  Win Percent :23.9 | Draw Percent :14.6 | Lost Percent :61.5
+9th training :=  Win Percent :23.6 | Draw Percent :13.3 | Lost Percent :63.1
+10th training :=  Win Percent :23.2 | Draw Percent :14.6 | Lost Percent :62.2
+11th training :=  Win Percent :23.7 | Draw Percent :15.3 | Lost Percent :61
+12th training :=  Win Percent :22.8 | Draw Percent :13.5 | Lost Percent :63.7
+13th training :=  Win Percent :24.9 | Draw Percent :12.6 | Lost Percent :62.5
+14th training :=  Win Percent :22.4 | Draw Percent :14.7 | Lost Percent :62.9
+15th training :=  Win Percent :22.7 | Draw Percent :12.9 | Lost Percent :64.4
+16th training :=  Win Percent :20.4 | Draw Percent :14.7 | Lost Percent :64.9
