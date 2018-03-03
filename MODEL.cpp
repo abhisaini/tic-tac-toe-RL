@@ -1,5 +1,7 @@
 #include <iostream>
-#include "matplotlibcpp.h"
+#include <vector>
+#include <stdlib.h>
+// #include "matplotlibcpp.h"
 #define WIN 1
 #define BLOCK 2
 #define FORK 3
@@ -35,7 +37,7 @@ public:
 	~state(void){}
 };
 
-std::vector<state> stateArray;
+typedef std::vector<state> stateArray;
 
 class model{
 public:
@@ -50,23 +52,23 @@ public:
 };
 
 std::vector<model> models;
-
-void pushInOrder(int modelNo, int turnCount, state* SPtr, int index) {
-
-	state S(3);
-	S.mat = SPtr->mat;
-	S.val = SPtr->val;
-	models[index].array.erase(SPtr);
-	for(int i = models[index].array.size()-1; i >= 0; i--) {
-			if (models[index].array[i].val <= S.val) models[index].array.insert(models[index].array.begin() + i, S); break;
-	}
-	return;
-}
+//
+// void pushInOrder(int modelNo, int turnCount, state* SPtr, int index) {
+//
+// 	state S(3);
+// 	S.mat = SPtr->mat;
+// 	S.val = SPtr->val;
+// 	models[index].array.erase(SPtr);
+// 	for(int i = models[index].array.size()-1; i >= 0; i--) {
+// 			if (models[index].array[i].val <= S.val) models[index].array.insert(models[index].array.begin() + i, S); break;
+// 	}
+// 	return;
+// }
 
 int rowSum(Matrix mat, int rowIndex, int player) {
   int sum = 0;
   for (int i = 0; i < 3; i++) {
-		if (mat[i][j] == player) sum = sum + mat[rowIndex][i];
+		if (mat[i][rowIndex] == player) sum++;
   }
   return sum;
 }
@@ -74,7 +76,7 @@ int rowSum(Matrix mat, int rowIndex, int player) {
 int colSum(Matrix mat, int colIndex, int player) {
   int sum = 0;
   for (int i = 0; i < 3; i++) {
-    if (mat[i][j] == player) sum = sum + mat[i][colIndex];
+    if (mat[i][colIndex] == player) sum++;
   }
   return sum;
 }
@@ -84,31 +86,23 @@ int diaSum(Matrix mat, int direction, int player) {
 	int sum = 0;
 	for (int i = 0; i < 3; i++) {
 		if (direction == 1) {
-			if (mat[i][i] == player) sum = sum + mat[i][i];
+			if (mat[i][i] == player) sum++;
 		}
 		else {
-			if (mat[i][2-j] == player) sum = sum + mat[i][2-i];
-		}
+			if (mat[i][2-i] == player) sum++;
 	}
-	return sum;
 }
-
-bool compareMatrices(Matrix mat1, Matrix mat2){
-	for (int i = 0; i < mat1.size(); i++) {
-		for (int j = 0; j < mat1.size(); j++){
-			if (mat1[i][j] != mat2[i][j]) return false;
-		}
-	}
-	return true;
+	return sum;
 }
 
 void getVal (state& S, int turnCount, int modelNo) {
 
 	for (int i = 0; i < models.size(); i++) {
 		if (models[i].config == modelNo && models[i].turnCount == turnCount) {
-			model M(models[i].config, models[i].turnCount) = models[i];
+			model M(models[i].config, models[i].turnCount);
+			M = models[i];
 			for (int j = 0; j < M.array.size(); j++) {
-				if (compareMatrices(S.mat, M.array[j])) S.val = M.array[j].val; return;
+				if (S.mat == M.array[j].mat) {S.val = M.array[j].val; return;}
 				else continue;
 			}
 			S.val = 0.5;
@@ -125,11 +119,11 @@ void getVal (state& S, int turnCount, int modelNo) {
 
 // the functions counts the positions where a player can move
 int spaceRandom(state const &S) {
-    int sz = s.mat.size();
+    int sz = S.mat.size();
     int val = 0;
     for(int i = 0; i < sz; i++) {
        for(int j = 0; j < sz; j++) {
-           if(s.mat[i][j] != 0) {
+           if(S.mat[i][j] != 0) {
                val++;
            }
        }
@@ -183,13 +177,13 @@ int gameOver(Matrix mat) {
 	if (emptySpaceCount == 0) return DRAW;
 
 	for (int i = 0; i < mat.size(); i++) {
-		if (rowSum(mat, i, PLAYER_O) == 3*PLAYER_O||colSum(mat, i, PLAYER_O) == 3*PLAYER_O) return LOSE;
-		else if (rowSum(mat, i, PLAYER_X) == 3*PLAYER_X||colSum(mat, i, PLAYER_X) == 3*PLAYER_X) return WIN;
+		if (rowSum(mat, i, PLAYER_O) == 3||colSum(mat, i, PLAYER_O) == 3) return LOSE;
+		else if (rowSum(mat, i, PLAYER_X) == 3||colSum(mat, i, PLAYER_X) == 3) return WIN;
 		else continue;
 	}
 
-	if (diaSum(mat, 1, PLAYER_O) == 3*PLAYER_O||diaSum(mat, -1, PLAYER_O) == 3*PLAYER_O) return LOSE;
-	else if (diaSum(mat, 1, PLAYER_X) == 3*PLAYER_X||diaSum(mat, -1, PLAYER_X) == 3*PLAYER_X) return WIN;
+	if (diaSum(mat, 1, PLAYER_O) == 3||diaSum(mat, -1, PLAYER_O) == 3) return LOSE;
+	else if (diaSum(mat, 1, PLAYER_X) == 3||diaSum(mat, -1, PLAYER_X) == 3) return WIN;
 	else return 2;
 }
 
@@ -265,7 +259,5 @@ void playGame(float epsilon, float alpha, int gridSize){
 				if (gameOver(oState.mat) == WIN||gameOver(oState.mat) == DRAW) break;
 
     }
-
 		return;
-
 }
