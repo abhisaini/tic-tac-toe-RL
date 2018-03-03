@@ -42,15 +42,86 @@ public:
 	int config;
 	int turnCount;
 	stateArray array;
-	model(int value) {
+	model(int value, int count) {
 		config = value;
+		turnCount = count;
 	}
 	~model(void){}
 };
 
 std::vector<model> models;
 
-void sort();
+void pushInOrder(int modelNo, int turnCount, state* SPtr, int index) {
+
+	state S(3);
+	S.mat = SPtr->mat;
+	S.val = SPtr->val;
+	models[index].array.erase(SPtr);
+	for(int i = models[index].array.size()-1; i >= 0; i--) {
+			if (models[index].array[i].val <= S.val) models[index].array.insert(models[index].array.begin() + i, S); break;
+	}
+	return;
+}
+
+int rowSum(Matrix mat, int rowIndex, int player) {
+  int sum = 0;
+  for (int i = 0; i < 3; i++) {
+		if (mat[i][j] == player) sum = sum + mat[rowIndex][i];
+  }
+  return sum;
+}
+
+int colSum(Matrix mat, int colIndex, int player) {
+  int sum = 0;
+  for (int i = 0; i < 3; i++) {
+    if (mat[i][j] == player) sum = sum + mat[i][colIndex];
+  }
+  return sum;
+}
+
+int diaSum(Matrix mat, int direction, int player) {
+
+	int sum = 0;
+	for (int i = 0; i < 3; i++) {
+		if (direction == 1) {
+			if (mat[i][i] == player) sum = sum + mat[i][i];
+		}
+		else {
+			if (mat[i][2-j] == player) sum = sum + mat[i][2-i];
+		}
+	}
+	return sum;
+}
+
+bool compareMatrices(Matrix mat1, Matrix mat2){
+	for (int i = 0; i < mat1.size(); i++) {
+		for (int j = 0; j < mat1.size(); j++){
+			if (mat1[i][j] != mat2[i][j]) return false;
+		}
+	}
+	return true;
+}
+
+void getVal (state& S, int turnCount, int modelNo) {
+
+	for (int i = 0; i < models.size(); i++) {
+		if (models[i].config == modelNo && models[i].turnCount == turnCount) {
+			model M(models[i].config, models[i].turnCount) = models[i];
+			for (int j = 0; j < M.array.size(); j++) {
+				if (compareMatrices(S.mat, M.array[j])) S.val = M.array[j].val; return;
+				else continue;
+			}
+			S.val = 0.5;
+			models[i].array.push_back(S);
+			return;
+		}
+		else continue;
+	}
+	model M(modelNo, turnCount);
+	models.push_back(M);
+	M.array.push_back(S);
+
+}
 
 // the functions counts the positions where a player can move
 int spaceRandom(state const &S) {
@@ -79,31 +150,50 @@ void randomChanged(state &S, int move, int player){
 
 	int sz = S.mat.size();
 	int moveX=move/sz, moveY=move%sz;
-    S.mat[moveX][moveY]= player;
-    return;
+  S.mat[moveX][moveY]= player;
+  return;
 }
 
 void randomMove(state &S1, state &S2, int player){
     int space = spaceRandom(S1);
-    int sz = S.mat.size();
+    int sz = S1.mat.size();
     int i = 0, j = 0, index = 0;
     int freespace[space];
     for(i = 0; i < sz; i++){
         for(j = 0; j < sz; j++){
-            if(S.mat[i][j] == 0){
+            if(S1.mat[i][j] == 0){
                 freespace[index]=sz*i+j;
                 index++;
             }
         }
     }
     int move=randomInput(freespace,space);
-
+		S2 = S1;
     randomChanged(S2, move, player);
     return;
 }
 
+int gameOver(Matrix mat) {
+	int emptySpaceCount = 0;
+	for (int i = 0; i < mat.size(); i++) {
+		for (int j = 0; j < mat.size(); j++) {
+				if (mat[i][j] != 0) emptySpaceCount++;
+		}
+	}
+	if (emptySpaceCount == 0) return DRAW;
 
-nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // policy is only for PLAYER_X
+	for (int i = 0; i < mat.size(); i++) {
+		if (rowSum(mat, i, PLAYER_O) == 3*PLAYER_O||colSum(mat, i, PLAYER_O) == 3*PLAYER_O) return LOSE;
+		else if (rowSum(mat, i, PLAYER_X) == 3*PLAYER_X||colSum(mat, i, PLAYER_X) == 3*PLAYER_X) return WIN;
+		else continue;
+	}
+
+	if (diaSum(mat, 1, PLAYER_O) == 3*PLAYER_O||diaSum(mat, -1, PLAYER_O) == 3*PLAYER_O) return LOSE;
+	else if (diaSum(mat, 1, PLAYER_X) == 3*PLAYER_X||diaSum(mat, -1, PLAYER_X) == 3*PLAYER_X) return WIN;
+	else return 2;
+}
+
+state* nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // policy is only for PLAYER_X
 
     // move of PLAYER_X
     // greedy or random
@@ -112,14 +202,29 @@ nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // policy 
         int modelNo;
         int turnCount;
         if (policy == GREEDY) {
+					modelNo = modelClassifier(S1, PLAYER_X);
+					turnCount = countTurns(S1);
+					int i = 0;
+					for (i = 0; i < models.size(); i++) {
+						if (models[i].config == modelNo && models[i].turnCount == turnCount) {
+							return &models[i].array[0];
+						}
+						else continue;
+					}
+					model M(modelNo, turnCount);
+					models.push_back(M);
+					randomMove(S1, S2, PLAYER_X);
+					M.array.push_back(S2);
+					return &models[i].array[0];
 
         }
         else {
-            randomMove(S1, S2, PLAYER_X);
-            modelNo = modelClassifier(S1, PLAYER_X);
-            turnCount = countTurns(S1);
-            
-            return NULL;
+          randomMove(S1, S2, PLAYER_X);
+          modelNo = modelClassifier(S1, PLAYER_X);
+          turnCount = countTurns(S1);
+          // get the val of the current state
+					getVal(S2, modelNo, turnCount);
+          return NULL;
         }
     }
 
@@ -134,8 +239,9 @@ nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // policy 
 void playGame(float epsilon, float alpha, int gridSize){
 
     state oState(gridSize);
-	state xState(gridSize);
-    state* dummyState(gridSize);
+		state xState(gridSize);
+    state* xStatePtr(gridSize);
+		state* dummyState(gridSize);
 
     int turns = int (1/epsilon);
     int turn_count = 0;
@@ -144,15 +250,22 @@ void playGame(float epsilon, float alpha, int gridSize){
     while(1){
         // decide the policy in this game turn
         if (epsilon)
-		{
-			turn_count++;
-			if (!(j%turns)) policy = EXPLORATORY;
-			else policy = GREEDY;
-		}
-		else policy = GREEDY;
+				{
+					turn_count++;
+					if (!(j%turns)) policy = EXPLORATORY;
+					else policy = GREEDY;
+				}
+				else policy = GREEDY;
 
-        dummyState = nextMove(oState, xState, policy, PLAYER_X);
+        xStatePtr = nextMove(oState, xState, policy, PLAYER_X);
+				dummyStatePtr->val = dummyStatePtr->val + alpha*(xStatePtr->val - dummyStatePtr->val); // update
+				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) break;
+				nextMove(xState, oState, EXPLORATORY, PLAYER_O);
+				dummyStatePtr = xStatePtr;
+				if (gameOver(oState.mat) == WIN||gameOver(oState.mat) == DRAW) break;
 
     }
+
+		return;
 
 }
