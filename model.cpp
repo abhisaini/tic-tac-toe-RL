@@ -134,27 +134,34 @@ void printMat(int gridSize, Matrix mat){
     std::cout <<std::endl;
 }
 
-void reSort(state State) {
+void reSort(state& State) {
 	state S(State.gridSize);
-	S.val = State.val;
-	S.config = State.config;
-	S.turnCount = State.turnCount;
-	// std::cout << statePtr << '\n';
-	S.mat = 	State.mat;
-	int i = 0;
+	S = State;
 
+	int i = 0;
 	for (i = 0; i < models.size(); i++) {
-		if (models[i].config == S.config && models[i].turnCount == S.turnCount) {
-			models[i].array.erase(models[i].array.begin());
+		if ((models[i].config == S.config) && (models[i].turnCount == S.turnCount)) {
+			for (int j = 0; j < models[i].array.size(); j++) {
+				if (S.mat == models[i].array[j].mat) { models[i].array.erase(models[i].array.begin() + j); break; }
+			}
 			break;
 		}
 	}
 
 	for (int j = 0; j < models[i].array.size(); j++) {
-			if (S.val >= models[i].array[j].val) models[i].array.insert(models[i].array.begin() + j, S); break;
+			if (S.val >= models[i].array[j].val) {
+				models[i].array.insert(models[i].array.begin() + j, S);
+				break;
+		 }
 	}
 
 	return;
+}
+
+void dummyfunction(state S) {
+
+	std::cout << "S.val : " << S.val << " , " << "S.config : " << S.config << " , " << "S.turnCount : " << S.turnCount << '\n';
+
 }
 
 int winClassifier(state const& S, int player) {
@@ -345,7 +352,7 @@ int gameOver(Matrix mat) {
 	else return 2;
 }
 
-state* nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // policy is only for PLAYER_X
+state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool train){ // policy is only for PLAYER_X
 
     if (player == PLAYER_X) {
 				std::cout << "PLAYER_X's turn" << '\n';
@@ -363,12 +370,16 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // 
 						}
 						else continue;
 					}
-					model M(modelNo, turnCount);
+
 					randomMove(S1, S2, PLAYER_X);
 					S2.config = modelNo;
 					S2.turnCount = turnCount;
-					M.array.push_back(S2);
-					models.push_back(M);
+					if (train) {
+						model M(modelNo, turnCount);
+						std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
+						M.array.push_back(S2);
+						models.push_back(M);
+					}
 					printMat(3, S2.mat);
 					return &models[i].array[0];
 
@@ -381,6 +392,12 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize){ // 
 					getVal(S2, modelNo, turnCount);
 					S2.config = modelNo;
 					S2.turnCount = turnCount;
+					if (train) {
+						model M(modelNo, turnCount);
+						std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
+						M.array.push_back(S2);
+						models.push_back(M);
+					}
 					printMat(3, S2.mat);
           return NULL;
         }
@@ -416,27 +433,89 @@ void playGame(float epsilon, float alpha, int gridSize){
 				}
 				else policy = GREEDY;
 
-				xStatePtr = nextMove(oState, xState, PLAYER_X, policy, 3);
+				xStatePtr = nextMove(oState, xState, PLAYER_X, policy, 3, true);
+				std::cout << "-------------------------------------------------" << '\n';
 				if (turn_count != 1) dummyStatePtr->val = dummyStatePtr->val + alpha*(xStatePtr->val - dummyStatePtr->val); // update
 				if (turn_count != 1) reSort(dummyState);
 				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) break;
-				nextMove(xState, oState, PLAYER_O, EXPLORATORY, 3);
-				{
-					dummyStatePtr = xStatePtr;
-					dummyState.mat = dummyStatePtr->mat;
-					dummyState.val = dummyStatePtr->val;
-					dummyState.config = dummyStatePtr->config;
-					dummyState.turnCount = dummyStatePtr->turnCount;
-				}
+				nextMove(xState, oState, PLAYER_O, EXPLORATORY, 3, true);
+				std::cout << "-------------------------------------------------" << '\n';
+				dummyStatePtr = xStatePtr;
+				dummyState.mat = dummyStatePtr->mat;
+				dummyState.val = dummyStatePtr->val;
+				dummyState.config = dummyStatePtr->config;
+				dummyState.turnCount = dummyStatePtr->turnCount;
 				if (gameOver(oState.mat) == LOSE||gameOver(oState.mat) == DRAW) break;
 
     }
 		return;
 }
 
+int game(int gridSize){ // only plays not update, output will be win or loose
+
+	state oState(gridSize);
+	state xState(gridSize);
+	int gameRes;
+	while(1){
+
+		nextMove(oState, xState, PLAYER_X, GREEDY, 3, false);
+		int gameRes = gameOver(xState.mat);
+		if ((gameRes == WIN)||(gameRes == DRAW)) return gameRes;
+
+		nextMove(xState, oState, PLAYER_O, EXPLORATORY, 3, false);
+		gameRes = gameOver(oState.mat);
+		if ((gameRes == LOSE)||(gameRes == DRAW)) return gameRes;
+
+	}
+}
+
 int main () {
 
-	playGame (0.1, 0.5, 3);
+	float epsilon, alpha;
+	int gridSize, trains;
+	int checkCount;
 
+	std::cout << "Enter epsilon : " << '\n';
+	std::cin >> epsilon;
+	std::cout << "Enter alpha : " << '\n';
+	std::cin >> alpha;
+	std::cout << "Enter gridSize : " << '\n';
+	std::cin >> gridSize;
+	std::cout << "Enter the no. of games to train : " << std::endl;
+	std::cin >> trains;
+	std::cout << "Enter checkCount : " << std::endl;
+	std::cin >> checkCount;
+
+	std::vector<float> winPercent;
+	std::vector<float> drawPercent;
+	std::vector<float> notLost;
+	std::vector<float> lostPercent;
+
+	for (int i = 0; i < trains; i++) {
+
+		playGame(epsilon, alpha, gridSize);
+
+		float gamesWin = 0;
+		float gamesDraw = 0;
+		float gamesLose = 0;
+
+		for (int j = 0; j < checkCount; j++) {
+
+			int gameResult = game(gridSize);
+			if (gameResult == WIN) gamesWin++;
+			else if (gameResult == LOSE) gamesLose++;
+			else if (gameResult == DRAW) gamesDraw++;
+
+		}
+
+		winPercent.push_back(100*(float(gamesWin)/checkCount));
+		drawPercent.push_back(100*(float(gamesDraw)/checkCount));
+		notLost.push_back(100*(float(gamesDraw)/checkCount + float(gamesWin)/checkCount));
+		lostPercent.push_back(100*(float(gamesLose)/checkCount));
+
+		std::cout << i << "th training :=  Win Percent : " << winPercent[i] << " | Draw Percent :" << drawPercent[i] << " | Lost Percent :" << lostPercent[i] << std::endl;
+
+	}
+	playGame(0.1, 0.5, 3);
 	return 0;
 }
