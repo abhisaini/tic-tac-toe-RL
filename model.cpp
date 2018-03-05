@@ -25,7 +25,7 @@
 #define EMPTY 0
 #define LOSE 0
 #define DRAW 4
-
+using namespace std;
 typedef std::vector<std::vector<int> > Matrix;
 
 class state { // inorder to describe  a state with the positions of X and O and its value function
@@ -151,10 +151,10 @@ void reSort(state& State) {
 	for (int j = 0; j < models[i].array.size(); j++) {
 			if (S.val >= models[i].array[j].val) {
 				models[i].array.insert(models[i].array.begin() + j, S);
-				break;
+				return;
 		 }
 	}
-
+	models[i].array.insert(models[i].array.begin(), S);
 	return;
 }
 
@@ -333,13 +333,6 @@ void randomMove(state &S1, state &S2, int player){
 }
 
 int gameOver(Matrix mat) {
-	int emptySpaceCount = 0;
-	for (int i = 0; i < mat.size(); i++) {
-		for (int j = 0; j < mat.size(); j++) {
-				if (mat[i][j] != 0) emptySpaceCount++;
-		}
-	}
-	if (emptySpaceCount == 0) return DRAW;
 
 	for (int i = 0; i < mat.size(); i++) {
 		if (rowSum(mat, i, PLAYER_O) == 3||colSum(mat, i, PLAYER_O) == 3) return LOSE;
@@ -349,7 +342,27 @@ int gameOver(Matrix mat) {
 
 	if (diaSum(mat, 1, PLAYER_O) == 3||diaSum(mat, -1, PLAYER_O) == 3) return LOSE;
 	else if (diaSum(mat, 1, PLAYER_X) == 3||diaSum(mat, -1, PLAYER_X) == 3) return WIN;
+
+	int emptySpaceCount = 0;
+	for (int i = 0; i < mat.size(); i++) {
+		for (int j = 0; j < mat.size(); j++) {
+				if (mat[i][j] != 0) emptySpaceCount++;
+		}
+	}
+	if (emptySpaceCount == 0) return DRAW;
+
 	else return 2;
+}
+
+bool isChild(Matrix M1, Matrix M2) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (M1[i][j] != 0) {
+				if (M2[i][j] != M1[i][j]) return false;
+			}
+		}
+	}
+	return true;
 }
 
 state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool train){ // policy is only for PLAYER_X
@@ -365,8 +378,13 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 					int i = 0;
 					for (i = 0; i < models.size(); i++) {
 						if (models[i].config == modelNo && models[i].turnCount == turnCount) {
-							printMat(3, models[i].array[0].mat);
-							return &models[i].array[0];
+							for (int j = 0; j < models[i].array.size(); j++) {
+								if (isChild(S1.mat, models[i].array[j].mat)) {
+									S2 = models[i].array[j];
+									printMat(3, S2.mat);
+									return &models[i].array[j];
+								}
+							}
 						}
 						else continue;
 					}
@@ -406,7 +424,7 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
     else {
 			std::cout << "PLAYER_O's turn" << '\n';
       randomMove(S1, S2, PLAYER_O);
-			std::cout << "EXPLORATORY policy choosen by PLAYER_X" << '\n';
+			std::cout << "EXPLORATORY policy choosen by PLAYER_O" << '\n';
 			printMat(3, S2.mat);
 			return NULL;
     }
@@ -437,7 +455,7 @@ void playGame(float epsilon, float alpha, int gridSize){
 				std::cout << "-------------------------------------------------" << '\n';
 				if (turn_count != 1) dummyStatePtr->val = dummyStatePtr->val + alpha*(xStatePtr->val - dummyStatePtr->val); // update
 				if (turn_count != 1) reSort(dummyState);
-				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) break;
+				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) { std::cout << "PLAYER_X : " << gameOver(xStatePtr->mat) << '\n'; break; }
 				nextMove(xState, oState, PLAYER_O, EXPLORATORY, 3, true);
 				std::cout << "-------------------------------------------------" << '\n';
 				dummyStatePtr = xStatePtr;
@@ -445,7 +463,7 @@ void playGame(float epsilon, float alpha, int gridSize){
 				dummyState.val = dummyStatePtr->val;
 				dummyState.config = dummyStatePtr->config;
 				dummyState.turnCount = dummyStatePtr->turnCount;
-				if (gameOver(oState.mat) == LOSE||gameOver(oState.mat) == DRAW) break;
+				if (gameOver(oState.mat) == LOSE||gameOver(oState.mat) == DRAW) { std::cout << "PLAYER_X : " << gameOver(oState.mat) << '\n'; break; }
 
     }
 		return;
@@ -516,6 +534,5 @@ int main () {
 		std::cout << i << "th training :=  Win Percent : " << winPercent[i] << " | Draw Percent :" << drawPercent[i] << " | Lost Percent :" << lostPercent[i] << std::endl;
 
 	}
-	playGame(0.1, 0.5, 3);
 	return 0;
 }
