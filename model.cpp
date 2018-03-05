@@ -27,7 +27,7 @@
 #define DRAW 4
 
 typedef std::vector<std::vector<int> > Matrix;
-
+using namespace std ;
 class state { // inorder to describe  a state with the positions of X and O and its value function
 	public:
 		int gridSize;
@@ -361,17 +361,20 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
         if (policy == GREEDY) {
 					std::cout << "GREEDY policy choosen by PLAYER_X" << '\n';
 					modelNo = modelClassifier(S1, PLAYER_X);
+					cout << "debug 1 \n";
 					turnCount = countTurns(S1);
+					cout << "debug 2 \n";
 					int i = 0;
 					for (i = 0; i < models.size(); i++) {
 						if (models[i].config == modelNo && models[i].turnCount == turnCount) {
-							printMat(3, models[i].array[0].mat);
+							// printMat(3, models[i].array[0].mat);
 							return &models[i].array[0];
 						}
 						else continue;
 					}
 
 					randomMove(S1, S2, PLAYER_X);
+					cout << "debug 3\n";
 					S2.config = modelNo;
 					S2.turnCount = turnCount;
 					if (train) {
@@ -380,7 +383,8 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 						M.array.push_back(S2);
 						models.push_back(M);
 					}
-					printMat(3, S2.mat);
+					cout << "debug 4 \n";
+					// printMat(3, S2.mat);
 					return &models[i].array[0];
 
         }
@@ -398,7 +402,7 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 						M.array.push_back(S2);
 						models.push_back(M);
 					}
-					printMat(3, S2.mat);
+					// printMat(3, S2.mat);
           return NULL;
         }
     }
@@ -407,7 +411,7 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 			std::cout << "PLAYER_O's turn" << '\n';
       randomMove(S1, S2, PLAYER_O);
 			std::cout << "EXPLORATORY policy choosen by PLAYER_X" << '\n';
-			printMat(3, S2.mat);
+			// printMat(3, S2.mat);
 			return NULL;
     }
 }
