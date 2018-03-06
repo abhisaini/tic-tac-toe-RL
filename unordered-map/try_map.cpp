@@ -254,6 +254,7 @@ void nextMove (state &currState, state &nextState, int policy, int player){
 		}
 		int freespace[count];
 		for (int i = 0; i < count; i++){
+		    freespace[i] = array[i];
 		}
 		// equate(dummyState, nextState);
 		int move = randomInput(freespace, count);
@@ -544,7 +545,7 @@ int main(int argc, char **argv){
 		if(humansChoice == "yes") humanPlay(gridSize);
 		else humanGameCount--;
 	}
-
+	cout << "\nTotal No. of states recorded is : " << stateMap.size() << endl ;
  return 0;
 
 }

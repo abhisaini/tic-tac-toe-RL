@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
-
+#include <bits/stdc++.h>
+#include "matplotlibcpp.h"
 // model No.'s
 #define WIN 1
 #define BLOCK 2
@@ -26,8 +27,9 @@
 #define LOSE 0
 #define DRAW 4
 using namespace std;
+namespace plt = matplotlibcpp; // namespace for plotting
 typedef std::vector<std::vector<int> > Matrix;
-using namespace std ;
+
 class state { // inorder to describe  a state with the positions of X and O and its value function
 	public:
 		int gridSize;
@@ -160,7 +162,7 @@ void reSort(state& State) {
 
 void dummyfunction(state S) {
 
-	std::cout << "S.val : " << S.val << " , " << "S.config : " << S.config << " , " << "S.turnCount : " << S.turnCount << '\n';
+	// std::cout << "S.val : " << S.val << " , " << "S.config : " << S.config << " , " << "S.turnCount : " << S.turnCount << '\n';
 
 }
 
@@ -346,7 +348,7 @@ int gameOver(Matrix mat) {
 	int emptySpaceCount = 0;
 	for (int i = 0; i < mat.size(); i++) {
 		for (int j = 0; j < mat.size(); j++) {
-				if (mat[i][j] != 0) emptySpaceCount++;
+				if (mat[i][j] == 0) emptySpaceCount++;
 		}
 	}
 	if (emptySpaceCount == 0) return DRAW;
@@ -368,22 +370,20 @@ bool isChild(Matrix M1, Matrix M2) {
 state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool train){ // policy is only for PLAYER_X
 
     if (player == PLAYER_X) {
-				std::cout << "PLAYER_X's turn" << '\n';
+				// std::cout << "PLAYER_X's turn" << '\n';
         int modelNo;
         int turnCount;
         if (policy == GREEDY) {
-					std::cout << "GREEDY policy choosen by PLAYER_X" << '\n';
+					// std::cout << "GREEDY policy choosen by PLAYER_X" << '\n';
 					modelNo = modelClassifier(S1, PLAYER_X);
-					cout << "debug 1 \n";
 					turnCount = countTurns(S1);
-					cout << "debug 2 \n";
 					int i = 0;
 					for (i = 0; i < models.size(); i++) {
 						if (models[i].config == modelNo && models[i].turnCount == turnCount) {
 							for (int j = 0; j < models[i].array.size(); j++) {
 								if (isChild(S1.mat, models[i].array[j].mat)) {
 									S2 = models[i].array[j];
-									printMat(3, S2.mat);
+									// printMat(3, S2.mat);
 									return &models[i].array[j];
 								}
 							}
@@ -392,22 +392,20 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 					}
 
 					randomMove(S1, S2, PLAYER_X);
-					cout << "debug 3\n";
 					S2.config = modelNo;
 					S2.turnCount = turnCount;
 					if (train) {
 						model M(modelNo, turnCount);
-						std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
+						// std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
 						M.array.push_back(S2);
 						models.push_back(M);
 					}
-					cout << "debug 4 \n";
 					// printMat(3, S2.mat);
 					return &models[i].array[0];
 
         }
         else {
-					std::cout << "EXPLORATORY policy choosen by PLAYER_X" << '\n';
+					// std::cout << "EXPLORATORY policy choosen by PLAYER_X" << '\n';
           randomMove(S1, S2, PLAYER_X);
           modelNo = modelClassifier(S1, PLAYER_X);
           turnCount = countTurns(S1);
@@ -416,7 +414,7 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
 					S2.turnCount = turnCount;
 					if (train) {
 						model M(modelNo, turnCount);
-						std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
+						// std::cout << "Built a model with ModelNo : " << modelNo << " and turnCount : " << turnCount << '\n';
 						M.array.push_back(S2);
 						models.push_back(M);
 					}
@@ -426,10 +424,10 @@ state* nextMove(state& S1, state& S2, int player, int policy, int gridSize, bool
     }
 
     else {
-			std::cout << "PLAYER_O's turn" << '\n';
+			// std::cout << "PLAYER_O's turn" << '\n';
       randomMove(S1, S2, PLAYER_O);
-			std::cout << "EXPLORATORY policy choosen by PLAYER_O" << '\n';
-			printMat(3, S2.mat);
+			// std::cout << "EXPLORATORY policy choosen by PLAYER_O" << '\n';
+			// printMat(3, S2.mat);
 			return NULL;
     }
 }
@@ -456,18 +454,20 @@ void playGame(float epsilon, float alpha, int gridSize){
 				else policy = GREEDY;
 
 				xStatePtr = nextMove(oState, xState, PLAYER_X, policy, 3, true);
-				std::cout << "-------------------------------------------------" << '\n';
+				// std::cout << "-------------------------------------------------" << '\n';
 				if (turn_count != 1) dummyStatePtr->val = dummyStatePtr->val + alpha*(xStatePtr->val - dummyStatePtr->val); // update
 				if (turn_count != 1) reSort(dummyState);
-				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) { std::cout << "PLAYER_X : " << gameOver(xStatePtr->mat) << '\n'; break; }
+				if (gameOver(xStatePtr->mat) == WIN||gameOver(xStatePtr->mat) == DRAW) { // std::cout << "PLAYER_X : " << gameOver(xStatePtr->mat) << '\n';
+					break; }
 				nextMove(xState, oState, PLAYER_O, EXPLORATORY, 3, true);
-				std::cout << "-------------------------------------------------" << '\n';
+				// std::cout << "-------------------------------------------------" << '\n';
 				dummyStatePtr = xStatePtr;
 				dummyState.mat = dummyStatePtr->mat;
 				dummyState.val = dummyStatePtr->val;
 				dummyState.config = dummyStatePtr->config;
 				dummyState.turnCount = dummyStatePtr->turnCount;
-				if (gameOver(oState.mat) == LOSE||gameOver(oState.mat) == DRAW) { std::cout << "PLAYER_X : " << gameOver(oState.mat) << '\n'; break; }
+				if (gameOver(oState.mat) == LOSE||gameOver(oState.mat) == DRAW) { // std::cout << "PLAYER_X : " << gameOver(oState.mat) << '\n';
+					break; }
 
     }
 		return;
@@ -491,6 +491,23 @@ int game(int gridSize){ // only plays not update, output will be win or loose
 	}
 }
 
+
+//function to plot the graphs;
+void plotGraph(std::vector<float> Trainings, std::vector<float> winPercent, std::vector<float> drawPercent, std::vector<float> notLost, std::vector<float> lostPercent, string plotfileName){
+	string plotTitle = "Percent vs Trains \n" + plotfileName;
+	using namespace plt;
+	named_plot("Draw", Trainings, drawPercent, "pink");
+	named_plot("Win", Trainings, winPercent, "r");
+	named_plot( "Win+Draw", Trainings, notLost, "b--");
+	named_plot("Lost", Trainings, lostPercent, "g--");
+	legend();
+	ylim(-5, 105);
+	title(plotTitle);
+	plt :: show();
+	cout << "The Graph is stored in file named : " << plotfileName << endl;
+
+}
+
 int main () {
 
 	float epsilon, alpha;
@@ -507,11 +524,13 @@ int main () {
 	std::cin >> trains;
 	std::cout << "Enter checkCount : " << std::endl;
 	std::cin >> checkCount;
+	string plotfile = "Plot-Results/Grid-" + to_string(gridSize)+ "/ Alpha-"+to_string(alpha)+"_Epsilon-" +to_string(epsilon) + "_Trainings-" + to_string(trains) + "CheckCount" +to_string(checkCount);
 
 	std::vector<float> winPercent;
 	std::vector<float> drawPercent;
 	std::vector<float> notLost;
 	std::vector<float> lostPercent;
+	std::vector<float> Trainings;
 
 	for (int i = 0; i < trains; i++) {
 
@@ -534,9 +553,11 @@ int main () {
 		drawPercent.push_back(100*(float(gamesDraw)/checkCount));
 		notLost.push_back(100*(float(gamesDraw)/checkCount + float(gamesWin)/checkCount));
 		lostPercent.push_back(100*(float(gamesLose)/checkCount));
-
+		Trainings.push_back(i) ;
 		std::cout << i << "th training :=  Win Percent : " << winPercent[i] << " | Draw Percent :" << drawPercent[i] << " | Lost Percent :" << lostPercent[i] << std::endl;
 
 	}
+	plotGraph(Trainings, winPercent, drawPercent, notLost, lostPercent, plotfile);
+
 	return 0;
 }
