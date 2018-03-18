@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import numpy as np
+import random as rand
 '''
 Here WEIGHTS is a dictionary defining the weights of all the possible move models.
 Now lets assume that we are in state S(n), and we have a variety of possiblities for S(n+1),
@@ -9,6 +10,10 @@ The function isLost() is defined explicitely, which will take the indices of opp
 tell whether we lost or not.
 Other than isLost(), we dont need further calculations of opponent.
 '''
+PLAYER_X = 1
+PLAYER_O = -1
+GREEDY = 1
+EXPLORATERY = 0
 WEIGHTS = {
     'win' : 1,
     'fork' : 0.5,
@@ -103,7 +108,58 @@ def grossVal(Matrix,i,j) :
     # classifiers_num.astype(float)
     VAL = np.sum(np.multiply(weights_num, classifiers_num))
     return VAL
-# any size of mat will e okay Here
+
+def randomMove(Matrix,player) :
+    # indices for zeros ( empty boxes)
+    empty_i, empty_j = np.where(Matrix == 0)
+    if len(empty_i) >= 1 :
+        move_tmp = rand.randint(0, len(empty_i) - 1)
+        move_i = empty_i[move_tmp]
+        move_j = empty_j[move_tmp]
+        Matrix[move_i][move_j] = player
+    else :
+        print ("Game Over")
+
+        # Needed arguments can be put later
+    return 
+
+def chooseBest(Matrix,possible_next_i,possible_next_j) :
+    values = []
+    total_possiblities = len(possible_next_i)
+    for x in range(total_possiblities) :
+        tmp_i = possible_next_i[x]
+        tmp_j = possible_next_j[x]
+        values.append(grossVal(Matrix,tmp_i,tmp_j))
+    print (values)
+def greedyMove(Matrix) : 
+    empty_i, empty_j = np.where(Matrix == 0) 
+    possible_next_i =[]
+    possible_next_j =[]
+    if len(empty_i) >= 1 :
+        for move_tmp in range(len(empty_i)) :
+            # tmp = np.copy(Matrix)
+            # print(Matrix,tmp)
+            move_i = empty_i[move_tmp]
+            move_j = empty_j[move_tmp]
+            # tmp[move_i][move_j] = 1
+            possible_next_i.append(move_i)
+            possible_next_j.append(move_j)
+            
+        # possible_next_i = np.delete(possible_next,0, axis=0)    
+        return possible_next_i,possible_next_j
+            # tmp[move_i][move_j] = 0
+    print(possible_next_i,possible_next_j)
+    
+def nextMove(Matrix,player,policy) :
+    if player == PLAYER_X and policy == EXPLORATERY :
+        randomMove(Matrix,player)
+    if player == PLAYER_O :
+        randomMove(Matrix,player)
+    if player == PLAYER_X and policy == GREEDY :
+        greedyMove(Matrix)
+
+
+# any size of mat will be okay Here
 # numpy doesnt require to mention size
 mat = np.array([
     [1, -1, 1],
@@ -172,4 +228,13 @@ print S.val()
 0 y 0
 x 0 y
 0 x 0
+'''
+
+
+'''
+import Weight_Learner as wl
+import numpy as np
+mat = np.array([ [0,0,0],[0,0,0],[0,0,0]])
+wl.greedyMove(mat)
+
 '''
